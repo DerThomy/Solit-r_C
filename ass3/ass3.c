@@ -35,7 +35,7 @@ enum CardValue
 
 ReturnValue printErrorMessage(ReturnValue return_value);
 ReturnValue readCardsFromPath(char *path);
-ReturnValue readCardsFromFromFile(FILE* file);
+ReturnValue readCardsFromFile(FILE* file);
 
 int main(int argc, char **argv)
 {
