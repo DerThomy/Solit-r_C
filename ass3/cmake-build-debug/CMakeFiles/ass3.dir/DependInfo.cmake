@@ -4,7 +4,7 @@ set(CMAKE_DEPENDS_LANGUAGES
   )
 # The set of files for implicit dependencies of each language:
 set(CMAKE_DEPENDS_CHECK_C
-  "C:/Users/Simon/CLionProjects/ass3/ass3.c" "C:/Users/Simon/CLionProjects/ass3/cmake-build-debug/CMakeFiles/ass3.dir/ass3.c.obj"
+  "C:/Users/Simon/CLionProjects/Solitaer_C/ass3/ass3.c" "C:/Users/Simon/CLionProjects/Solitaer_C/ass3/cmake-build-debug/CMakeFiles/ass3.dir/ass3.c.obj"
   )
 set(CMAKE_C_COMPILER_ID "MSVC")
 
