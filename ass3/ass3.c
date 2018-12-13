@@ -3,7 +3,7 @@
 //
 // Solitaire
 //
-// Group: - study assistant Mathias Kahr
+// Group: 04 - study assistant Mathias Kahr
 //
 // Authors: Simon Joham 11814175
 //  Thomas Köhler 11827322
@@ -89,6 +89,9 @@ ReturnValue printErrorMessage(ReturnValue return_value)
       break;
     case INVALID_FILE:
       printf("[ERR] Invalid file!\n");
+      break;
+    case EVERYTHING_OK:
+      //left blank intentionally
       break;
   }
   return return_value;
