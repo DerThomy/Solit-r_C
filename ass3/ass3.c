@@ -6,7 +6,7 @@
 // Group: - study assistant Mathias Kahr
 //
 // Authors: Simon Joham 11814175
-//  Thomas Köhler #matNr
+//  Thomas Köhler 11827322
 //
 // Latest Changes: 13.12.2018 (by Simon Joham)
 //-----------------------------------------------------------------------------
