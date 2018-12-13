@@ -6,7 +6,7 @@
 // Group: - study assistant Mathias Kahr
 //
 // Authors: Simon Joham 11814175
-//  Thomas Köhler 11827322
+// Thomas Köhler 11827322
 //
 // Latest Changes: 13.12.2018 (by Simon Joham)
 //-----------------------------------------------------------------------------
@@ -66,8 +66,6 @@ ReturnValue readCardsFromFromFile(FILE* file)
 {
 
 }
-
-
 
 //------------------------------------------------------------------------------
 ///
