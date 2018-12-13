@@ -46,6 +46,8 @@ int main(int argc, char **argv)
     return printErrorMessage(INVALID_ARGUMENTS);
   }
 
+  char **cards = malloc(26*3);
+
   return 0;
 }
 
