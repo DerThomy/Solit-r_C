@@ -58,13 +58,13 @@ ReturnValue readCardsFromPath(char *path)
   {
     return INVALID_FILE;
   }
-  ReturnValue read_return_value = readCardsFromFromFile(file);
+  ReturnValue read_return_value = readCardsFromFile(file);
 
   fclose(file);
   return read_return_value;
 }
 
-ReturnValue readCardsFromFromFile(FILE* file)
+ReturnValue readCardsFromFile(FILE* file)
 {
 
 }
