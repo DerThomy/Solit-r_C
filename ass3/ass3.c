@@ -6,7 +6,7 @@
 // Group: 04 - study assistant Mathias Kahr
 //
 // Authors: Simon Joham 11814175
-//  Thomas Köhler 11827322
+// Thomas Köhler 11827322
 //
 // Latest Changes: 13.12.2018 (by Simon Joham)
 //-----------------------------------------------------------------------------
@@ -35,7 +35,7 @@ enum CardValue
 
 ReturnValue printErrorMessage(ReturnValue return_value);
 ReturnValue readCardsFromPath(char *path);
-ReturnValue readCardsFromFromFile(FILE* file);
+ReturnValue readCardsFromFile(FILE* file);
 
 int main(int argc, char **argv)
 {
@@ -45,6 +45,8 @@ int main(int argc, char **argv)
   {
     return printErrorMessage(INVALID_ARGUMENTS);
   }
+
+  char **cards = malloc(26*3);
 
   return 0;
 }
@@ -56,18 +58,16 @@ ReturnValue readCardsFromPath(char *path)
   {
     return INVALID_FILE;
   }
-  ReturnValue read_return_value = readCardsFromFromFile(file);
+  ReturnValue read_return_value = readCardsFromFile(file);
 
   fclose(file);
   return read_return_value;
 }
 
-ReturnValue readCardsFromFromFile(FILE* file)
+ReturnValue readCardsFromFile(FILE* file)
 {
 
 }
-
-
 
 //------------------------------------------------------------------------------
 ///
