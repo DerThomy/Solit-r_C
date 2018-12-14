@@ -14,6 +14,18 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+typedef struct Card_
+{
+  char color;
+  int value;
+  struct Card_ *next;
+}Card;
+//Stores Cards in a Stack and which type of stack it is (e.g. GameStack)
+typedef struct CardStack_
+{
+  struct Card_ Cards;
+  char *stack_type;
+}CardStack;
 
 //Return values of the program
 typedef enum _ReturnValue_
@@ -46,7 +58,7 @@ int main(int argc, char **argv)
     return printErrorMessage(INVALID_ARGUMENTS);
   }
 
-  char **cards = malloc(26*3);
+  //char **cards = malloc(26*3);
 
   return 0;
 }
@@ -66,7 +78,16 @@ ReturnValue readCardsFromPath(char *path)
 
 ReturnValue readCardsFromFile(FILE* file)
 {
-
+//  for(int variable_iterator = 0; variable_iterator < 4; variable_iterator++)
+//  {
+//    ReturnValue
+//            return_value = readSingleValue(file, variables[variable_iterator]);
+//    if(return_value != EVERYTHING_OK)
+//    {
+//      return return_value;
+//    }
+//  }
+  return EVERYTHING_OK;
 }
 
 //------------------------------------------------------------------------------
