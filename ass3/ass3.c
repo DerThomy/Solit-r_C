@@ -14,18 +14,6 @@
 
 #include <stdio.h>
 #include <stdlib.h>
-typedef struct Card_
-{
-  char color;
-  int value;
-  struct Card_ *next;
-}Card;
-//Stores Cards in a Stack and which type of stack it is (e.g. GameStack)
-typedef struct CardStack_
-{
-  struct Card_ Cards;
-  char *stack_type;
-}CardStack;
 
 //Return values of the program
 typedef enum _ReturnValue_
@@ -35,6 +23,44 @@ typedef enum _ReturnValue_
   OUT_OF_MEMORY = 2,
   INVALID_FILE = 3
 } ReturnValue;
+
+//Stores Card
+typedef struct Card_
+{
+  char color;
+  int value;
+  struct Card_ *next;
+}Card;
+//Stores a card stack and which type of stack it is (e.g. GameStack)
+typedef struct CardStack_
+{
+  struct Card_ Cards; //the stack of cards
+  char *stack_type;
+}CardStack;
+//Adds new card to the top
+void addTop(Card **top, char color, int value)
+{
+  // make new card and copy data to it:
+  Card* new_card = malloc(sizeof(Card));
+  new_card->color = color;
+  new_card->value = value;
+
+  new_card->next = *top;    // next points to previous top card
+  *top = new_card;          // top now points to new card
+}
+//Deletes top card
+Card delTop(Card **top)
+{
+  Card *old_top = *top;  // remember the old top card
+
+  Card copy_old_top; // we want to return the old Card so we have to copy it
+  copy_old_top.color = old_top->color;
+  copy_old_top.value = old_top->value;
+
+  *top = old_top->next;       // move top card down
+  free(old_top);              // now we can free the old card
+  return copy_old_top;                // and return the card we remembered
+}
 
 enum CardValue
 {
