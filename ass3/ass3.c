@@ -14,6 +14,7 @@
 
 #include <stdio.h>
 #include <stdlib.h>
+#include <string.h>
 
 //Return values of the program
 typedef enum _ReturnValue_
@@ -37,11 +38,20 @@ typedef struct CardStack_
   struct Card_ Cards; //the stack of cards
   char *stack_type;
 }CardStack;
+void copyCard(Card *dest, Card *src)
+{
+  dest->color = dest->color;
+  dest->value = src->value;
+}
+void freeCard(Card *s)
+{
+  free(s->next);
+}
 //Adds new card to the top
 void addTop(Card **top, char color, int value)
 {
   // make new card and copy data to it:
-  Card* new_card = malloc(sizeof(Card));
+  Card *new_card = malloc(sizeof(Card));
   new_card->color = color;
   new_card->value = value;
 
@@ -53,18 +63,29 @@ Card delTop(Card **top)
 {
   Card *old_top = *top;  // remember the old top card
 
-  Card copy_old_top; // we want to return the old Card so we have to copy it
-  copy_old_top.color = old_top->color;
-  copy_old_top.value = old_top->value;
+  Card copy_old_top;
+  copyCard(&copy_old_top, old_top);
 
   *top = old_top->next;       // move top card down
   free(old_top);              // now we can free the old card
   return copy_old_top;                // and return the card we remembered
 }
 //Searches for a specific card
-int FindCard(Card **top, char color, int value)
+Card *FindCard(Card **top, Card *spec_card)
 {
+   Card *old_top = *top;
+   while(old_top->next != NULL)
+   {
+     if(old_top->color == spec_card->color && old_top->value == spec_card->value )
+     {
+       //if a matching card is found, the whole stack starting with the specific card will be returned
+       copyCard(spec_card, old_top);
+       return spec_card;
+     }
+     old_top = old_top->next; //move one card down
+   }
 
+  return NULL;
 }
 
 enum CardValue
@@ -78,7 +99,7 @@ enum CardValue
 
 ReturnValue printErrorMessage(ReturnValue return_value);
 ReturnValue readCardsFromPath(char *path);
-ReturnValue readCardsFromFile(FILE* file);
+ReturnValue readCardsFromFile(FILE *file);
 
 int main(int argc, char **argv)
 {
@@ -89,7 +110,9 @@ int main(int argc, char **argv)
     return printErrorMessage(INVALID_ARGUMENTS);
   }
 
-  //char **cards = malloc(26*3);
+  CardStack *test = NULL;
+  //hier kommt ein Fehler weil die Pointerdatentypen nicht passen.
+ // addTop(&test->Cards,'R',2);
 
   return 0;
 }
