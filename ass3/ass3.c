@@ -61,6 +61,11 @@ Card delTop(Card **top)
   free(old_top);              // now we can free the old card
   return copy_old_top;                // and return the card we remembered
 }
+//Searches for a specific card
+int FindCard(Card **top, char color, int value)
+{
+
+}
 
 enum CardValue
 {
