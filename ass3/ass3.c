@@ -32,21 +32,70 @@ typedef struct Card_
   int value;
   struct Card_ *next;
 }Card;
+
 //Stores a card stack and which type of stack it is (e.g. GameStack)
 typedef struct CardStack_
 {
-  struct Card_ Cards; //the stack of cards
+  struct Card_ *Cards; //the stack of cards
   char *stack_type;
 }CardStack;
+
+enum CardValue
+{
+   A = 1,
+   J = 11,
+   Q = 12,
+   K = 13
+};
+
+void copyCard(Card *dest, Card *src);
+void freeCard(Card *s);
+void addTop(Card **top, char color, int value);
+Card delTop(Card **top);
+Card *FindCard(Card **top, Card *spec_card);
+void printCard(Card card);
+ReturnValue readCardsFromPath(char *path);
+ReturnValue readCardsFromFile(FILE *file);
+ReturnValue readSingleCard(FILE *file);
+ReturnValue printErrorMessage(ReturnValue return_value);
+
+int main(int argc, char **argv)
+{
+  printf("%d\n",argc);
+
+  if(argc != 2)
+  {
+    return printErrorMessage(INVALID_ARGUMENTS);
+  }
+
+  CardStack *test = malloc(sizeof(CardStack));
+  //Simple check
+  addTop(&test->Cards, 'R', 2);
+  addTop(&test->Cards, 'B', 3);
+  printCard(test->Cards[0]);
+
+  delTop(&test->Cards);
+
+  printCard(test->Cards[0]);
+  //check end
+
+
+
+  return 0;
+}
+
 void copyCard(Card *dest, Card *src)
 {
-  dest->color = dest->color;
+  dest->color = src->color;
   dest->value = src->value;
 }
+
 void freeCard(Card *s)
 {
-  free(s->next);
+  //So nicht möglich, da wir mit stacks arbeiten
+  //free(s->next);
 }
+
 //Adds new card to the top
 void addTop(Card **top, char color, int value)
 {
@@ -58,6 +107,7 @@ void addTop(Card **top, char color, int value)
   new_card->next = *top;    // next points to previous top card
   *top = new_card;          // top now points to new card
 }
+
 //Deletes top card
 Card delTop(Card **top)
 {
@@ -70,6 +120,7 @@ Card delTop(Card **top)
   free(old_top);              // now we can free the old card
   return copy_old_top;                // and return the card we remembered
 }
+
 //Searches for a specific card
 Card *FindCard(Card **top, Card *spec_card)
 {
@@ -88,38 +139,14 @@ Card *FindCard(Card **top, Card *spec_card)
   return NULL;
 }
 
-enum CardValue
+void printCard(Card card)
 {
-   A = 1,
-   J = 11,
-   Q = 12,
-   K = 13
-};
-
-
-ReturnValue printErrorMessage(ReturnValue return_value);
-ReturnValue readCardsFromPath(char *path);
-ReturnValue readCardsFromFile(FILE *file);
-
-int main(int argc, char **argv)
-{
-  printf("%d\n",argc);
-
-  if(argc != 2)
-  {
-    return printErrorMessage(INVALID_ARGUMENTS);
-  }
-
-  CardStack *test = NULL;
-  //hier kommt ein Fehler weil die Pointerdatentypen nicht passen.
- // addTop(&test->Cards,'R',2);
-
-  return 0;
+  printf("%c%d", card.color, card.value);
 }
 
 ReturnValue readCardsFromPath(char *path)
 {
-  FILE* file = fopen(path, "r");
+  FILE *file = fopen(path, "r");
   if(file == NULL)
   {
     return INVALID_FILE;
@@ -130,18 +157,22 @@ ReturnValue readCardsFromPath(char *path)
   return read_return_value;
 }
 
-ReturnValue readCardsFromFile(FILE* file)
+ReturnValue readCardsFromFile(FILE *file)
 {
-//  for(int variable_iterator = 0; variable_iterator < 4; variable_iterator++)
-//  {
-//    ReturnValue
-//            return_value = readSingleValue(file, variables[variable_iterator]);
-//    if(return_value != EVERYTHING_OK)
-//    {
-//      return return_value;
-//    }
-//  }
+  for(int card = 0; card <= 26; card++)
+  {
+    ReturnValue return_value = readSingleCard(file);
+    if(return_value != EVERYTHING_OK)
+  {
+    return return_value;
+  }
+}
   return EVERYTHING_OK;
+}
+
+ReturnValue readSingleCard(FILE *file)
+{
+  
 }
 
 //------------------------------------------------------------------------------
