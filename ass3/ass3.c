@@ -15,6 +15,8 @@
 #include <stdio.h>
 #include <stdlib.h>
 #include <string.h>
+#include <ctype.h>
+#include <errno.h>
 
 //Return values of the program
 typedef enum _ReturnValue_
@@ -48,6 +50,7 @@ enum CardValue
    K = 13
 };
 
+void *malloc_check(size_t size);
 void copyCard(Card *dest, Card *src);
 void freeCard(Card *s);
 void addTop(Card **top, char color, int value);
@@ -56,32 +59,27 @@ Card *FindCard(Card **top, Card *spec_card);
 void printCard(Card card);
 ReturnValue readCardsFromPath(char *path);
 ReturnValue readCardsFromFile(FILE *file);
-ReturnValue readSingleCard(FILE *file);
+ReturnValue checkCards(char **input, int lines);
 ReturnValue printErrorMessage(ReturnValue return_value);
 
 int main(int argc, char **argv)
 {
-  printf("%d\n",argc);
-
   if(argc != 2)
   {
     return printErrorMessage(INVALID_ARGUMENTS);
   }
 
-  CardStack *test = malloc(sizeof(CardStack));
-  //Simple check
-  addTop(&test->Cards, 'R', 2);
-  addTop(&test->Cards, 'B', 3);
-  printCard(test->Cards[0]);
-
-  delTop(&test->Cards);
-
-  printCard(test->Cards[0]);
-  //check end
-
-
+  return printErrorMessage(readCardsFromPath(argv[1]));
 
   return 0;
+}
+
+void *malloc_check(size_t size)
+{
+  void *buffer = malloc(size);
+  if(buffer == NULL)
+    exit(printErrorMessage(OUT_OF_MEMORY));
+  return buffer;
 }
 
 void copyCard(Card *dest, Card *src)
@@ -100,7 +98,7 @@ void freeCard(Card *s)
 void addTop(Card **top, char color, int value)
 {
   // make new card and copy data to it:
-  Card *new_card = malloc(sizeof(Card));
+  Card *new_card = malloc_check(sizeof(Card));
   new_card->color = color;
   new_card->value = value;
 
@@ -159,20 +157,67 @@ ReturnValue readCardsFromPath(char *path)
 
 ReturnValue readCardsFromFile(FILE *file)
 {
-  for(int card = 0; card <= 26; card++)
+  char **cards = malloc_check(26 * 8);
+  char *line;
+  int len, line_counter, ch;
+  ReturnValue return_value = EVERYTHING_OK;
+  for(line_counter = 0; (ch = getc(file)) != EOF; )
   {
-    ReturnValue return_value = readSingleCard(file);
-    if(return_value != EVERYTHING_OK)
-  {
-    return return_value;
+    ch = toupper(ch);
+    line = malloc_check(8);
+    for (len=0; ch != '\n' && ch != EOF; )
+    {
+      if(len > 6)
+        return INVALID_FILE;
+      if(ch != ' ' && ch != 0)
+      {  
+        line[len++] = ch;
+      }
+      ch = getc(file);
+    }
+    line[len] = '\0';
+    cards[line_counter++] = line;
   }
-}
-  return EVERYTHING_OK;
+  return_value = checkCards(cards, line_counter);
+  free(cards);
+  return return_value;
 }
 
-ReturnValue readSingleCard(FILE *file)
+ReturnValue checkCards(char **input, int lines)
 {
-  
+  if(lines < 26)
+    return INVALID_FILE;
+    
+  char **cards = (char *[]){
+    "REDA", "RED2", "RED3", "RED4", "RED5", "RED6", "RED7",
+    "RED8", "RED9", "RED10", "REDJ", "REDQ", "REDK",
+    "BLACKA", "BLACK2", "BLACK3", "BLACK4", "BLACK5", "BLACK6",
+    "BLACK7", "BLACK8", "BLACK9", "BLACK10", "BLACKJ", "BLACKQ", "BLACKK"
+  };
+  char **included_cards = malloc_check(26*8);
+  int included_counter = 0;
+  int line, card;
+  for(line = 0; line < lines; line++)
+  {
+    for(card = 0; card < lines; card++)
+    {
+      if(!strcmp(input[line], cards[card]))
+      {
+        for(int included = 0; included < included_counter; included++)
+        {
+          if(!strcmp(input[line], included_cards[included]))
+          {
+            printf("not unique %s\n", input[line]);
+            return INVALID_FILE;
+          }
+        }
+        included_cards[included_counter++] = input[line];
+        continue;
+      }
+    }
+  }
+  free(included_cards);
+  return included_counter == 26 ? EVERYTHING_OK : INVALID_FILE;
 }
 
 //------------------------------------------------------------------------------
