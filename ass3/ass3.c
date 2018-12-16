@@ -168,7 +168,7 @@ ReturnValue readCardsFromFile(FILE *file)
     line[0] = 0;
     for (len=0; ch != '\n' && ch != EOF; )
     {
-      if(len > 6)
+      if(len > 7)
         return INVALID_FILE;
       if(!isspace(ch) && !isblank(ch))
       {  
@@ -179,9 +179,11 @@ ReturnValue readCardsFromFile(FILE *file)
     if(strlen(line) != 0)
     {
       line[len] = '\0';
+      //printf("%s %d\n", line, (unsigned int)strlen(line));
       cards[line_counter++] = line;
     }
   }
+  //printf("%d", line_counter);
   return_value = checkCards(cards, line_counter);
   free(cards);
   return return_value;
