@@ -28,5 +28,4 @@ BLACK   10
          RED Q
     RED K
 BLACK J
-   BLACK Q
 BLACK    K

@@ -74,9 +74,11 @@ int main(int argc, char **argv)
   ReturnValue return_value = readCardsFromPath(argv[1], test);
   if(return_value != EVERYTHING_OK)
   {
+    free(test);
     return printErrorMessage(return_value);
   }
 
+  free(test);
   return 0;
 }
 
@@ -163,7 +165,7 @@ ReturnValue readCardsFromPath(char *path, CardStack *cardStack)
 
 ReturnValue readCardsFromFile(FILE *file, CardStack *cardStack)
 {
-  char **cards = malloc_check(26 * 8);
+  char **cards = malloc_check(27*8);
   char *line;
   int len, line_counter, ch;
   ReturnValue return_value = EVERYTHING_OK;
@@ -175,11 +177,14 @@ ReturnValue readCardsFromFile(FILE *file, CardStack *cardStack)
     for (len=0; ch != '\n' && ch != EOF; )
     {
       if(len > 7)
-        return INVALID_FILE;
-      if(!isspace(ch) && !isblank(ch))
-      {  
-        line[len++] = ch;
+      {
+        printf("too long");
+        return_value = INVALID_FILE;
+        free(line);
+        break;
       }
+      if(!isspace(ch) && !isblank(ch))
+        line[len++] = ch;
       ch = getc(file);
     }
     if(strlen(line) != 0)
@@ -188,18 +193,29 @@ ReturnValue readCardsFromFile(FILE *file, CardStack *cardStack)
       //printf("%s %d\n", line, (unsigned int)strlen(line));
       cards[line_counter++] = line;
     }
+    else
+      free(line);
+    if(return_value != EVERYTHING_OK)
+      break;
   }
-  //printf("%d", line_counter);
-  return_value = checkCards(cards, line_counter);
+  return_value = return_value == EVERYTHING_OK ? checkCards(cards, line_counter) : return_value;
+  for(int li = 0; li < line_counter; li++)
+  {
+    free(cards[li]);
+  }
+  free(cards);
   if(return_value != EVERYTHING_OK)
     return return_value;
-  free(cards);
+  return EVERYTHING_OK;
 }
 
 ReturnValue checkCards(char **input, int lines)
 {
   if(lines < 26 || lines > 26)
+  {
+    printf("too short or big");
     return INVALID_FILE;
+  }
     
   char **cards = (char *[]){
     "REDA", "RED2", "RED3", "RED4", "RED5", "RED6", "RED7",
@@ -221,6 +237,7 @@ ReturnValue checkCards(char **input, int lines)
           if(!strcmp(input[line], included_cards[included]))
           {
             printf("not unique %s\n", input[line]);
+            free(included_cards);
             return INVALID_FILE;
           }
         }
