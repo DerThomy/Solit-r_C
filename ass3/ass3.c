@@ -165,18 +165,22 @@ ReturnValue readCardsFromFile(FILE *file)
   {
     ch = toupper(ch);
     line = malloc_check(8);
+    line[0] = 0;
     for (len=0; ch != '\n' && ch != EOF; )
     {
       if(len > 6)
         return INVALID_FILE;
-      if(ch != ' ' && ch != 0)
+      if(!isspace(ch) && !isblank(ch))
       {  
         line[len++] = ch;
       }
       ch = getc(file);
     }
-    line[len] = '\0';
-    cards[line_counter++] = line;
+    if(strlen(line) != 0)
+    {
+      line[len] = '\0';
+      cards[line_counter++] = line;
+    }
   }
   return_value = checkCards(cards, line_counter);
   free(cards);
@@ -185,7 +189,7 @@ ReturnValue readCardsFromFile(FILE *file)
 
 ReturnValue checkCards(char **input, int lines)
 {
-  if(lines < 26)
+  if(lines < 26 || lines > 26)
     return INVALID_FILE;
     
   char **cards = (char *[]){
@@ -194,7 +198,7 @@ ReturnValue checkCards(char **input, int lines)
     "BLACKA", "BLACK2", "BLACK3", "BLACK4", "BLACK5", "BLACK6",
     "BLACK7", "BLACK8", "BLACK9", "BLACK10", "BLACKJ", "BLACKQ", "BLACKK"
   };
-  char **included_cards = malloc_check(26*8);
+  char **included_cards = malloc_check(lines*8);
   int included_counter = 0;
   int line, card;
   for(line = 0; line < lines; line++)
