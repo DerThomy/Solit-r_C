@@ -57,8 +57,8 @@ void addTop(Card **top, char color, int value);
 Card delTop(Card **top);
 Card *FindCard(Card **top, Card *spec_card);
 void printCard(Card card);
-ReturnValue readCardsFromPath(char *path);
-ReturnValue readCardsFromFile(FILE *file);
+ReturnValue readCardsFromPath(char *path, CardStack *cardStack);
+ReturnValue readCardsFromFile(FILE *file, CardStack *cardStack);
 ReturnValue checkCards(char **input, int lines);
 ReturnValue printErrorMessage(ReturnValue return_value);
 
@@ -69,7 +69,13 @@ int main(int argc, char **argv)
     return printErrorMessage(INVALID_ARGUMENTS);
   }
 
-  return printErrorMessage(readCardsFromPath(argv[1]));
+  CardStack *test = malloc_check(sizeof(CardStack));
+
+  ReturnValue return_value = readCardsFromPath(argv[1], test);
+  if(return_value != EVERYTHING_OK)
+  {
+    return printErrorMessage(return_value);
+  }
 
   return 0;
 }
@@ -142,20 +148,20 @@ void printCard(Card card)
   printf("%c%d", card.color, card.value);
 }
 
-ReturnValue readCardsFromPath(char *path)
+ReturnValue readCardsFromPath(char *path, CardStack *cardStack)
 {
   FILE *file = fopen(path, "r");
   if(file == NULL)
   {
     return INVALID_FILE;
   }
-  ReturnValue read_return_value = readCardsFromFile(file);
+  ReturnValue read_return_value = readCardsFromFile(file, cardStack);
 
   fclose(file);
   return read_return_value;
 }
 
-ReturnValue readCardsFromFile(FILE *file)
+ReturnValue readCardsFromFile(FILE *file, CardStack *cardStack)
 {
   char **cards = malloc_check(26 * 8);
   char *line;
@@ -185,8 +191,9 @@ ReturnValue readCardsFromFile(FILE *file)
   }
   //printf("%d", line_counter);
   return_value = checkCards(cards, line_counter);
+  if(return_value != EVERYTHING_OK)
+    return return_value;
   free(cards);
-  return return_value;
 }
 
 ReturnValue checkCards(char **input, int lines)
