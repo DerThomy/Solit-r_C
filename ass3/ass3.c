@@ -42,14 +42,14 @@ typedef enum _StackType_
 typedef struct Card_
 {
   char color;
-  int value;
+  char *value;
   struct Card_ *next;
 }Card;
 
 //Stores a card stack and which type of stack it is (e.g. GameStack)
 typedef struct CardStack_
 {
-  struct Card_ *Cards; //the stack of cards
+  struct Card_ *top_card; //the stack of cards
   char *stack_type;
 }CardStack;
 
@@ -64,14 +64,15 @@ enum CardValue
 void *malloc_check(size_t size);
 void copyCard(Card *dest, Card *src);
 void freeCard(Card *s);
-void addTop(Card **top, char color, int value);
+void addTop(Card **top, char color, char *value);
 Card delTop(Card **top);
 Card *FindCard(Card **top, Card *spec_card);
 void printCard(Card card);
 ReturnValue readCardsFromPath(char *path, CardStack **card_stack);
 ReturnValue readCardsFromFile(FILE *file, CardStack **card_stack);
 ReturnValue checkCards(char **input, int lines);
-ReturnValue addCardsToStacks(CardStack **card_stack);
+ReturnValue addCardsToStacks(char **cards, CardStack **card_stack);
+char *getCardValue(char *card);
 ReturnValue printErrorMessage(ReturnValue return_value);
 
 int main(int argc, char **argv)
@@ -83,12 +84,17 @@ int main(int argc, char **argv)
 
   CardStack **stacks = malloc_check(sizeof(CardStack *) * 7);
   for(int stack = 0; stack < 7; stack++)
-    stacks[stack] = malloc(sizeof(CardStack));
+  {
+    stacks[stack] = malloc_check(sizeof(CardStack));
+    stacks[stack]->top_card = NULL;
+  }
 
   ReturnValue return_value = readCardsFromPath(argv[1], stacks);
 
   for(int stack = 0; stack < 7; stack++)
   {
+    for(Card *card = stacks[stack]->top_card; card != NULL; card = card->next)
+      free(card);
     free(stacks[stack]);
   }
   free(stacks);
@@ -116,7 +122,7 @@ void freeCard(Card *s)
 }
 
 //Adds new card to the top
-void addTop(Card **top, char color, int value)
+void addTop(Card **top, char color, char *value)
 {
   // make new card and copy data to it:
   Card *new_card = malloc_check(sizeof(Card));
@@ -160,7 +166,7 @@ Card *FindCard(Card **top, Card *spec_card)
 
 void printCard(Card card)
 {
-  printf("%c%d", card.color, card.value);
+  printf("%c%s", card.color, card.value);
 }
 
 ReturnValue readCardsFromPath(char *path, CardStack **card_stack)
@@ -262,9 +268,30 @@ ReturnValue checkCards(char **input, int lines)
 
 ReturnValue addCardsToStacks(char **cards, CardStack **card_stack)
 {
-  for(int card = 0; card < 26; card++)
+  int card = 0;
+  for(int round = 0; round < 4; round++)
   {
-    
+    for(int stack = GAME_STACK_1; stack <= GAME_STACK_4; stack++)
+    {
+      addTop(&card_stack[stack]->top_card, cards[card][0], getCardValue(cards[card]));
+      card++;
+    }
+  }
+  return EVERYTHING_OK;
+}
+
+char *getCardValue(char *card)
+{
+  switch(card[0])
+  {
+    case 'R':
+      return &card[3];
+      break;
+    case 'B':
+      return &card[5];
+      break;
+    default:
+      return NULL;
   }
 }
 
