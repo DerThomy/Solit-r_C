@@ -61,7 +61,8 @@ enum CardValue
    K = 13
 };
 
-void *malloc_check(size_t size);
+void renderStacks(CardStack **stacks);
+void *mallocCheck(size_t size);
 void copyCard(Card *dest, Card *src);
 void freeCard(Card *s);
 void addTop(Card **top, char color, char *value);
@@ -82,10 +83,10 @@ int main(int argc, char **argv)
     return printErrorMessage(INVALID_ARGUMENTS);
   }
 
-  CardStack **stacks = malloc_check(sizeof(CardStack *) * 7);
+  CardStack **stacks = mallocCheck(sizeof(CardStack *) * 7);
   for(int stack = 0; stack < 7; stack++)
   {
-    stacks[stack] = malloc_check(sizeof(CardStack));
+    stacks[stack] = mallocCheck(sizeof(CardStack));
     stacks[stack]->top_card = NULL;
   }
 
@@ -101,7 +102,14 @@ int main(int argc, char **argv)
   return printErrorMessage(return_value);;
 }
 
-void *malloc_check(size_t size)
+void renderStacks(CardStack **stacks)
+{
+  printf("0   | 1   | 2   | 3   | 4   | DEP | DEP\n
+          ---------------------------------------\n");
+  
+}
+
+void *mallocCheck(size_t size)
 {
   void *buffer = malloc(size);
   if(buffer == NULL)
@@ -125,7 +133,7 @@ void freeCard(Card *s)
 void addTop(Card **top, char color, char *value)
 {
   // make new card and copy data to it:
-  Card *new_card = malloc_check(sizeof(Card));
+  Card *new_card = mallocCheck(sizeof(Card));
   new_card->color = color;
   new_card->value = value;
 
@@ -184,14 +192,14 @@ ReturnValue readCardsFromPath(char *path, CardStack **card_stack)
 
 ReturnValue readCardsFromFile(FILE *file, CardStack **card_stack)
 {
-  char **cards = malloc_check(27*8);
+  char **cards = mallocCheck(27*8);
   char *line;
   int len, line_counter, ch;
   ReturnValue return_value = EVERYTHING_OK;
   for(line_counter = 0; (ch = getc(file)) != EOF; )
   {
     ch = toupper(ch);
-    line = malloc_check(8);
+    line = mallocCheck(8);
     line[0] = 0;
     for (len=0; ch != '\n' && ch != EOF; )
     {
@@ -239,7 +247,7 @@ ReturnValue checkCards(char **input, int lines)
     "BLACKA", "BLACK2", "BLACK3", "BLACK4", "BLACK5", "BLACK6",
     "BLACK7", "BLACK8", "BLACK9", "BLACK10", "BLACKJ", "BLACKQ", "BLACKK"
   };
-  char **included_cards = malloc_check(lines*8);
+  char **included_cards = mallocCheck(lines*8);
   int included_counter = 0;
   int line, card;
   for(line = 0; line < lines; line++)
@@ -276,6 +284,10 @@ ReturnValue addCardsToStacks(char **cards, CardStack **card_stack)
       addTop(&card_stack[stack]->top_card, cards[card][0], getCardValue(cards[card]));
       card++;
     }
+  }
+  for(;card < 26;card++)
+  {
+    addTop(&card_stack[PICK_OFF_STACK]->top_card, cards[card][0], getCardValue(cards[card]));
   }
   return EVERYTHING_OK;
 }
