@@ -104,8 +104,8 @@ int main(int argc, char **argv)
 
 void renderStacks(CardStack **stacks)
 {
-  printf("0   | 1   | 2   | 3   | 4   | DEP | DEP\n
-          ---------------------------------------\n");
+  printf("0   | 1   | 2   | 3   | 4   | DEP | DEP\n");
+  printf("---------------------------------------\n");
   
 }
 
