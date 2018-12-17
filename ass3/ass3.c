@@ -27,6 +27,17 @@ typedef enum _ReturnValue_
   INVALID_FILE = 3
 } ReturnValue;
 
+typedef enum _StackType_
+{
+  PICK_OFF_STACK = 0,
+  GAME_STACK_1 = 1,
+  GAME_STACK_2 = 2,
+  GAME_STACK_3 = 3,
+  GAME_STACK_4 = 4,
+  DEPOSIT_STACK_1 = 5,
+  DEPOSIT_STACK_2 = 6
+} StackType;
+
 //Stores Card
 typedef struct Card_
 {
@@ -57,9 +68,10 @@ void addTop(Card **top, char color, int value);
 Card delTop(Card **top);
 Card *FindCard(Card **top, Card *spec_card);
 void printCard(Card card);
-ReturnValue readCardsFromPath(char *path, CardStack *cardStack);
-ReturnValue readCardsFromFile(FILE *file, CardStack *cardStack);
+ReturnValue readCardsFromPath(char *path, CardStack **card_stack);
+ReturnValue readCardsFromFile(FILE *file, CardStack **card_stack);
 ReturnValue checkCards(char **input, int lines);
+ReturnValue addCardsToStacks(CardStack **card_stack);
 ReturnValue printErrorMessage(ReturnValue return_value);
 
 int main(int argc, char **argv)
@@ -69,17 +81,18 @@ int main(int argc, char **argv)
     return printErrorMessage(INVALID_ARGUMENTS);
   }
 
-  CardStack *test = malloc_check(sizeof(CardStack));
+  CardStack **stacks = malloc_check(sizeof(CardStack *) * 7);
+  for(int stack = 0; stack < 7; stack++)
+    stacks[stack] = malloc(sizeof(CardStack));
 
-  ReturnValue return_value = readCardsFromPath(argv[1], test);
-  if(return_value != EVERYTHING_OK)
+  ReturnValue return_value = readCardsFromPath(argv[1], stacks);
+
+  for(int stack = 0; stack < 7; stack++)
   {
-    free(test);
-    return printErrorMessage(return_value);
+    free(stacks[stack]);
   }
-
-  free(test);
-  return 0;
+  free(stacks);
+  return printErrorMessage(return_value);;
 }
 
 void *malloc_check(size_t size)
@@ -150,20 +163,20 @@ void printCard(Card card)
   printf("%c%d", card.color, card.value);
 }
 
-ReturnValue readCardsFromPath(char *path, CardStack *cardStack)
+ReturnValue readCardsFromPath(char *path, CardStack **card_stack)
 {
   FILE *file = fopen(path, "r");
   if(file == NULL)
   {
     return INVALID_FILE;
   }
-  ReturnValue read_return_value = readCardsFromFile(file, cardStack);
+  ReturnValue read_return_value = readCardsFromFile(file, card_stack);
 
   fclose(file);
   return read_return_value;
 }
 
-ReturnValue readCardsFromFile(FILE *file, CardStack *cardStack)
+ReturnValue readCardsFromFile(FILE *file, CardStack **card_stack)
 {
   char **cards = malloc_check(27*8);
   char *line;
@@ -199,14 +212,11 @@ ReturnValue readCardsFromFile(FILE *file, CardStack *cardStack)
       break;
   }
   return_value = return_value == EVERYTHING_OK ? checkCards(cards, line_counter) : return_value;
+  return_value = return_value == EVERYTHING_OK ? addCardsToStacks(cards, card_stack) : return_value;
   for(int li = 0; li < line_counter; li++)
-  {
-    free(cards[li]);
-  }
+      free(cards[li]);
   free(cards);
-  if(return_value != EVERYTHING_OK)
-    return return_value;
-  return EVERYTHING_OK;
+  return return_value;
 }
 
 ReturnValue checkCards(char **input, int lines)
@@ -248,6 +258,14 @@ ReturnValue checkCards(char **input, int lines)
   }
   free(included_cards);
   return included_counter == 26 ? EVERYTHING_OK : INVALID_FILE;
+}
+
+ReturnValue addCardsToStacks(char **cards, CardStack **card_stack)
+{
+  for(int card = 0; card < 26; card++)
+  {
+    
+  }
 }
 
 //------------------------------------------------------------------------------

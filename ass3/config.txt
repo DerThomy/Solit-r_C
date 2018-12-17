@@ -11,7 +11,7 @@ RED 7
 RED 10
 
 BLACK 4
-BLACK        5
+BLACK        
 RED 4
     RED   5
     BLACK 6
