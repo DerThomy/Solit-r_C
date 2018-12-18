@@ -94,8 +94,12 @@ int main(int argc, char **argv)
 
   for(int stack = 0; stack < 7; stack++)
   {
-    for(Card *card = stacks[stack]->top_card; card != NULL; card = card->next)
+    Card *next = NULL;
+    for(Card *card = stacks[stack]->top_card; card != NULL; card = next)
+    {
+      next = card->next;
       free(card);
+    }
     free(stacks[stack]);
   }
   free(stacks);
