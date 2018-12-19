@@ -95,7 +95,8 @@ int main(int argc, char **argv)
   ReturnValue return_value = readCardsFromPath(argv[1], stacks);
 
   freeStacks(stacks);
-  return printErrorMessage(return_value);;
+  return printErrorMessage(return_value);
+  return 0;
 }
 
 void freeStacks(CardStack **stacks)
@@ -148,15 +149,13 @@ void addTop(Card **top, char color, char *value)
   new_card->color = color;
   new_card->value = value;
 
-
+  Card *old_top = *top;
   new_card->next = *top;    // next points to previous top card
   *top = new_card; // top now points to new card
-  if(new_card->next != NULL) //if top was already a card, the previous card of the old top is new card (top)
+  if(old_top != NULL)
   {
-    (new_card->next)->previous = new_card;
+    old_top->previous = new_card;
   }
-
-
 }
 
 //Deletes top card
@@ -167,8 +166,8 @@ Card delTop(Card **top)
   Card copy_old_top;
   copyCard(&copy_old_top, old_top);
 
+  old_top->next->previous = NULL;
   *top = old_top->next;       // move top card down
-  free((*top)->previous);
   free(old_top);              // now we can free the old card
   return copy_old_top;                // and return the card we remembered
 }
