@@ -16,7 +16,6 @@
 #include <stdlib.h>
 #include <string.h>
 #include <ctype.h>
-#include <errno.h>
 
 //Return values of the program
 typedef enum _ReturnValue_
@@ -44,13 +43,14 @@ typedef struct Card_
   char color;
   char *value;
   struct Card_ *next;
-  struct Card_ *previous;
+  struct Card_ *prev;
 }Card;
 
 //Stores a card stack and which type of stack it is (e.g. GameStack)
 typedef struct CardStack_
 {
   struct Card_ *top_card; //the stack of cards
+  struct Card_ *bottom_card;
   char *stack_type;
 }CardStack;
 
@@ -62,14 +62,18 @@ enum CardValue
    K = 13
 };
 
+void initStacks(CardStack **stacks);
 void freeStacks(CardStack **stacks);
 void renderStacks(CardStack **stacks);
+void printRows(CardStack **stacks);
+void printPickOffStack(Card *card);
+void printOtherStacks(Card *card, int stack);
 void *mallocCheck(size_t size);
 void copyCard(Card *dest, Card *src);
 void freeCard(Card *s);
-void addTop(Card **top, char color, char *value);
-Card delTop(Card **top);
-Card *FindCard(Card **top, Card *spec_card);
+void addTop(CardStack *stack, char color, char *value);
+Card delTop(CardStack *stack);
+Card *FindCard(CardStack *stack, Card *spec_card);
 void printCard(Card card);
 ReturnValue readCardsFromPath(char *path, CardStack **card_stack);
 ReturnValue readCardsFromFile(FILE *file, CardStack **card_stack);
@@ -86,17 +90,24 @@ int main(int argc, char **argv)
   }
 
   CardStack **stacks = mallocCheck(sizeof(CardStack *) * 7);
-  for(int stack = 0; stack < 7; stack++)
-  {
-    stacks[stack] = mallocCheck(sizeof(CardStack));
-    stacks[stack]->top_card = NULL;
-  }
+  initStacks(stacks);
 
   ReturnValue return_value = readCardsFromPath(argv[1], stacks);
 
+  //renderStacks(stacks);
+
   freeStacks(stacks);
   return printErrorMessage(return_value);
-  return 0;
+}
+
+void initStacks(CardStack **stacks)
+{
+    for(int stack = 0; stack < 7; stack++)
+  {
+    stacks[stack] = mallocCheck(sizeof(CardStack));
+    stacks[stack]->top_card = NULL;
+    stacks[stack]->bottom_card = NULL;
+  }
 }
 
 void freeStacks(CardStack **stacks)
@@ -118,7 +129,58 @@ void renderStacks(CardStack **stacks)
 {
   printf("0   | 1   | 2   | 3   | 4   | DEP | DEP\n");
   printf("---------------------------------------\n");
-  
+  printRows(stacks);
+}
+
+void printRows(CardStack **stacks)
+{
+  Card *pick_off_card = stacks[PICK_OFF_STACK]->bottom_card;
+  Card *other_stacks_card = NULL;
+  for(int row = 0; row < 1; row++)
+  {
+    printPickOffStack(pick_off_card);
+    for(int stack = GAME_STACK_1; stack <= DEPOSIT_STACK_2; stack++)
+    {
+      if(row == 0)
+        other_stacks_card = stacks[stack]->bottom_card;
+      printOtherStacks(other_stacks_card, stack);
+    }
+    printf("\n");
+  }
+  pick_off_card = pick_off_card->next;
+  other_stacks_card = other_stacks_card->next;
+}
+
+void printPickOffStack(Card *card)
+{
+  if(card != NULL)
+  {
+    if(card->next == NULL)
+      printf("X   ");
+    else
+    {
+      printCard(*card);
+      strlen(card->value) > 1 ? printf(" ") : printf("  ");
+    }
+  }
+  else
+    printf("    ");
+}
+
+void printOtherStacks(Card *card, int stack)
+{
+  printf("| ");
+    if(card != NULL)
+    {
+      printCard(*card);
+      if(stack != DEPOSIT_STACK_2)
+        strlen(card->value) > 1 ? printf(" ") : printf("  ");
+      else
+        if(strlen(card->value) == 1)
+          printf(" ");
+    }
+    else
+      stack == DEPOSIT_STACK_2 ? printf("    ") : printf("     ");
 }
 
 void *mallocCheck(size_t size)
@@ -142,40 +204,40 @@ void freeCard(Card *s)
 }
 
 //Adds new card to the top
-void addTop(Card **top, char color, char *value)
+void addTop(CardStack *stack, char color, char *value)
 {
   // make new card and copy data to it:
   Card *new_card = mallocCheck(sizeof(Card));
   new_card->color = color;
   new_card->value = value;
 
-  Card *old_top = *top;
-  new_card->next = *top;    // next points to previous top card
-  *top = new_card; // top now points to new card
+  Card *old_top = stack->top_card;
+  new_card->next = old_top;    // next points to previous top card
   if(old_top != NULL)
-  {
-    old_top->previous = new_card;
-  }
+    old_top->prev = new_card;
+  else
+    stack->bottom_card = new_card;
+  stack->top_card = new_card; // top now points to new card
 }
 
 //Deletes top card
-Card delTop(Card **top)
+Card delTop(CardStack *stack)
 {
-  Card *old_top = *top;  // remember the old top card
+  Card *old_top = stack->top_card;  // remember the old top card
 
   Card copy_old_top;
   copyCard(&copy_old_top, old_top);
 
-  old_top->next->previous = NULL;
-  *top = old_top->next;       // move top card down
+  old_top->next->prev = NULL;
+  stack->top_card = old_top->next;       // move top card down
   free(old_top);              // now we can free the old card
   return copy_old_top;                // and return the card we remembered
 }
 
 //Searches for a specific card
-Card *FindCard(Card **top, Card *spec_card)
+Card *FindCard(CardStack *stack, Card *spec_card)
 {
-   Card *old_top = *top;
+   Card *old_top = stack->top_card;
    while(old_top->next != NULL)
    {
      if(old_top->color == spec_card->color && old_top->value == spec_card->value )
@@ -299,13 +361,13 @@ ReturnValue addCardsToStacks(char **cards, CardStack **card_stack)
   {
     for(int stack = GAME_STACK_1; stack <= GAME_STACK_4; stack++)
     {
-      addTop(&card_stack[stack]->top_card, cards[card][0], getCardValue(cards[card]));
+      addTop(card_stack[stack], cards[card][0], getCardValue(cards[card]));
       card++;
     }
   }
   for(;card < 26;card++)
   {
-    addTop(&card_stack[PICK_OFF_STACK]->top_card, cards[card][0], getCardValue(cards[card]));
+    addTop(card_stack[PICK_OFF_STACK], cards[card][0], getCardValue(cards[card]));
   }
   return EVERYTHING_OK;
 }
