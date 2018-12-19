@@ -44,6 +44,7 @@ typedef struct Card_
   char color;
   char *value;
   struct Card_ *next;
+  struct Card_ *previous;
 }Card;
 
 //Stores a card stack and which type of stack it is (e.g. GameStack)
@@ -147,8 +148,10 @@ void addTop(Card **top, char color, char *value)
   new_card->color = color;
   new_card->value = value;
 
+
   new_card->next = *top;    // next points to previous top card
-  *top = new_card;          // top now points to new card
+  *(*top)->previous = *new_card;
+  *top = new_card; // top now points to new card
 }
 
 //Deletes top card
