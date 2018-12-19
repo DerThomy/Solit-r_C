@@ -61,6 +61,7 @@ enum CardValue
    K = 13
 };
 
+void freeStacks(CardStack **stacks);
 void renderStacks(CardStack **stacks);
 void *mallocCheck(size_t size);
 void copyCard(Card *dest, Card *src);
@@ -92,6 +93,12 @@ int main(int argc, char **argv)
 
   ReturnValue return_value = readCardsFromPath(argv[1], stacks);
 
+  freeStacks(stacks);
+  return printErrorMessage(return_value);;
+}
+
+void freeStacks(CardStack **stacks)
+{
   for(int stack = 0; stack < 7; stack++)
   {
     Card *next = NULL;
@@ -103,7 +110,6 @@ int main(int argc, char **argv)
     free(stacks[stack]);
   }
   free(stacks);
-  return printErrorMessage(return_value);;
 }
 
 void renderStacks(CardStack **stacks)
