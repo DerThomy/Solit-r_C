@@ -151,7 +151,7 @@ void addTop(Card **top, char color, char *value)
 
   new_card->next = *top;    // next points to previous top card
   *top = new_card; // top now points to new card
-  if(new_card->next != NULL) //if top was already a card, the previous card of the old top is new card
+  if(new_card->next != NULL) //if top was already a card, the previous card of the old top is new card (top)
   {
     (new_card->next)->previous = new_card;
   }
