@@ -150,8 +150,14 @@ void addTop(Card **top, char color, char *value)
 
 
   new_card->next = *top;    // next points to previous top card
-  *(*top)->previous = *new_card;
+
   *top = new_card; // top now points to new card
+  if(new_card->next != NULL)
+  {
+    (new_card->next)->previous = new_card;
+  }
+
+
 }
 
 //Deletes top card
@@ -163,6 +169,7 @@ Card delTop(Card **top)
   copyCard(&copy_old_top, old_top);
 
   *top = old_top->next;       // move top card down
+  free((*top)->previous);
   free(old_top);              // now we can free the old card
   return copy_old_top;                // and return the card we remembered
 }
