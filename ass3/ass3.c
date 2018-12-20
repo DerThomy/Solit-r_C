@@ -62,7 +62,7 @@ enum CardValue
    K = 13
 };
 
-void processUserInput();
+void playLoop(CardStack **stacks);
 void initStacks(CardStack **stacks);
 void freeStacks(CardStack **stacks);
 void renderStacks(CardStack **stacks);
@@ -97,17 +97,17 @@ int main(int argc, char **argv)
   ReturnValue return_value = readCardsFromPath(argv[1], stacks);
   if(return_value == EVERYTHING_OK)
   {
-    renderStacks(stacks);
-    processUserInput();
+    playLoop(stacks)
   }
   freeStacks(stacks);
   return printErrorMessage(return_value);
 }
 
-void processUserInput()
+void playLoop(CardStack **stacks)
 {
   char *input = malloc(sizeof(char) * 20);
   int running = 1;
+  renderStacks(stacks);
   do
   {
     printf("esp> ");
