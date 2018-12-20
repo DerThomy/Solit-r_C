@@ -63,6 +63,7 @@ enum CardValue
 };
 
 void playLoop(CardStack **stacks);
+char *getInput();
 void initStacks(CardStack **stacks);
 void freeStacks(CardStack **stacks);
 void renderStacks(CardStack **stacks);
@@ -105,13 +106,13 @@ int main(int argc, char **argv)
 
 void playLoop(CardStack **stacks)
 {
-  char *input = malloc(sizeof(char) * 20);
+  char *input = NULL;
   int running = 1;
   renderStacks(stacks);
   do
   {
     printf("esp> ");
-    fgets(input, sizeof(char) * 20, stdin);
+    input = getInput();
     for(int ch = 0; ch < strlen(input); ch++)
       input[ch] = tolower(input[ch]);
     if(!strcmp(input, "help\n"))
@@ -125,8 +126,44 @@ void playLoop(CardStack **stacks)
       running = 0;
     else
       printf("[INFO] Invalid command!\n");
+    free(input);
   } while(running);
-  free(input);
+}
+
+char *getInput()
+{
+  char *input = malloc(sizeof(char) * 20);
+  int count = 0;
+  int space_added = 0;
+  int trimmed = 0;
+  int realloced = 1;
+  int ch;
+  while((ch = getchar()) != '\n' && ch != EOF)
+  {
+    if(ch != ' ' || trimmed)
+    {
+      trimmed = 1;
+      if(ch != ' ')
+      {
+        printf("%c", ch);
+        input[count] = ch;
+        space_added = 0;
+      }
+      else if(!space_added)
+      {
+        printf("%c", ch);
+        
+        input[count] = ' ';
+        space_added = 1;
+      }
+    }
+    if(++count + 1 > sizeof(char) * 20 * realloced)
+      input = realloc(input, sizeof(char) * 20 * ++realloced);
+  }
+  input[count] = '\n';
+  input[count + 1] = '\0';
+  printf("%c", input[count + 1]);
+  return input;
 }
 
 void initStacks(CardStack **stacks)
