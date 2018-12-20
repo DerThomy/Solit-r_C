@@ -74,12 +74,13 @@ void freeCard(Card *s);
 void addTop(CardStack *stack, char color, char *value);
 Card delTop(CardStack *stack);
 Card *FindCard(CardStack *stack, Card *spec_card);
-void printCard(Card card);
+void printCard(Card *card);
 ReturnValue readCardsFromPath(char *path, CardStack **card_stack);
 ReturnValue readCardsFromFile(FILE *file, CardStack **card_stack);
 ReturnValue checkCards(char **input, int lines);
 ReturnValue addCardsToStacks(char **cards, CardStack **card_stack);
 char *getCardValue(char *card);
+char *copyString(char *string);
 ReturnValue printErrorMessage(ReturnValue return_value);
 
 int main(int argc, char **argv)
@@ -94,7 +95,7 @@ int main(int argc, char **argv)
 
   ReturnValue return_value = readCardsFromPath(argv[1], stacks);
 
-  //renderStacks(stacks);
+  renderStacks(stacks);
 
   freeStacks(stacks);
   return printErrorMessage(return_value);
@@ -118,6 +119,7 @@ void freeStacks(CardStack **stacks)
     for(Card *card = stacks[stack]->top_card; card != NULL; card = next)
     {
       next = card->next;
+      free(card->value);
       free(card);
     }
     free(stacks[stack]);
@@ -135,31 +137,33 @@ void renderStacks(CardStack **stacks)
 void printRows(CardStack **stacks)
 {
   Card *pick_off_card = stacks[PICK_OFF_STACK]->bottom_card;
-  Card *other_stacks_card = NULL;
-  for(int row = 0; row < 1; row++)
+  Card **other_stacks_cards = malloc(sizeof(Card *) * 7);
+  for(int row = 0; row < 16; row++)
   {
     printPickOffStack(pick_off_card);
     for(int stack = GAME_STACK_1; stack <= DEPOSIT_STACK_2; stack++)
     {
       if(row == 0)
-        other_stacks_card = stacks[stack]->bottom_card;
-      printOtherStacks(other_stacks_card, stack);
+        other_stacks_cards[stack] = stacks[stack]->bottom_card;
+      else
+        other_stacks_cards[stack] = other_stacks_cards[stack] == NULL ? NULL : other_stacks_cards[stack]->prev;
+      printOtherStacks(other_stacks_cards[stack], stack);
     }
     printf("\n");
+    pick_off_card = pick_off_card == NULL ? NULL : pick_off_card->prev;
   }
-  pick_off_card = pick_off_card->next;
-  other_stacks_card = other_stacks_card->next;
+  free(other_stacks_cards);
 }
 
 void printPickOffStack(Card *card)
 {
   if(card != NULL)
   {
-    if(card->next == NULL)
+    if(card->prev != NULL)
       printf("X   ");
     else
     {
-      printCard(*card);
+      printCard(card);
       strlen(card->value) > 1 ? printf(" ") : printf("  ");
     }
   }
@@ -172,7 +176,7 @@ void printOtherStacks(Card *card, int stack)
   printf("| ");
     if(card != NULL)
     {
-      printCard(*card);
+      printCard(card);
       if(stack != DEPOSIT_STACK_2)
         strlen(card->value) > 1 ? printf(" ") : printf("  ");
       else
@@ -180,7 +184,7 @@ void printOtherStacks(Card *card, int stack)
           printf(" ");
     }
     else
-      stack == DEPOSIT_STACK_2 ? printf("    ") : printf("     ");
+      stack == DEPOSIT_STACK_2 ? printf("   ") : printf("    ");
 }
 
 void *mallocCheck(size_t size)
@@ -213,6 +217,7 @@ void addTop(CardStack *stack, char color, char *value)
 
   Card *old_top = stack->top_card;
   new_card->next = old_top;    // next points to previous top card
+  new_card->prev = NULL;
   if(old_top != NULL)
     old_top->prev = new_card;
   else
@@ -252,9 +257,10 @@ Card *FindCard(CardStack *stack, Card *spec_card)
   return NULL;
 }
 
-void printCard(Card card)
+void printCard(Card *card)
 {
-  printf("%c%s", card.color, card.value);
+  if(card->color != '\0' && card->value != NULL)
+    printf("%c%s", card->color, card->value);
 }
 
 ReturnValue readCardsFromPath(char *path, CardStack **card_stack)
@@ -359,7 +365,7 @@ ReturnValue addCardsToStacks(char **cards, CardStack **card_stack)
   int card = 0;
   for(int round = 0; round < 4; round++)
   {
-    for(int stack = GAME_STACK_1; stack <= GAME_STACK_4; stack++)
+    for(int stack = GAME_STACK_1 + round; stack <= GAME_STACK_4; stack++)
     {
       addTop(card_stack[stack], cards[card][0], getCardValue(cards[card]));
       card++;
@@ -377,14 +383,21 @@ char *getCardValue(char *card)
   switch(card[0])
   {
     case 'R':
-      return &card[3];
+      return copyString(&card[3]);
       break;
     case 'B':
-      return &card[5];
+      return copyString(&card[5]);
       break;
     default:
       return NULL;
   }
+}
+
+char *copyString(char *string)
+{
+  char *copy = malloc(sizeof(string));
+  strcpy(copy, string);
+  return copy;
 }
 
 //------------------------------------------------------------------------------
