@@ -62,6 +62,7 @@ enum CardValue
    K = 13
 };
 
+void processUserInput();
 void initStacks(CardStack **stacks);
 void freeStacks(CardStack **stacks);
 void renderStacks(CardStack **stacks);
@@ -95,10 +96,37 @@ int main(int argc, char **argv)
 
   ReturnValue return_value = readCardsFromPath(argv[1], stacks);
   if(return_value == EVERYTHING_OK)
+  {
     renderStacks(stacks);
-
+    processUserInput();
+  }
   freeStacks(stacks);
   return printErrorMessage(return_value);
+}
+
+void processUserInput()
+{
+  char *input = malloc(sizeof(char) * 20);
+  int running = 1;
+  do
+  {
+    printf("esp> ");
+    fgets(input, sizeof(char) * 20, stdin);
+    for(int ch = 0; ch < strlen(input); ch++)
+      input[ch] = tolower(input[ch]);
+    if(!strcmp(input, "help\n"))
+    {
+      printf("possible command:\n");
+      printf(" - move <color> <value> to <stacknumber>\n");
+      printf(" - help\n");
+      printf(" - exit\n");
+    }
+    else if(!strcmp(input, "exit\n"))
+      running = 0;
+    else
+      printf("[INFO] Invalid command!\n");
+  } while(running);
+  free(input);
 }
 
 void initStacks(CardStack **stacks)
@@ -284,7 +312,6 @@ ReturnValue readCardsFromFile(FILE *file, CardStack **card_stack)
   ReturnValue return_value = EVERYTHING_OK;
   for(line_counter = 0; (ch = getc(file)) != EOF; )
   {
-    ch = toupper(ch);
     line = mallocCheck(8);
     line[0] = 0;
     for (len=0; ch != '\n' && ch != EOF; )
