@@ -94,8 +94,8 @@ int main(int argc, char **argv)
   initStacks(stacks);
 
   ReturnValue return_value = readCardsFromPath(argv[1], stacks);
-
-  renderStacks(stacks);
+  if(return_value == EVERYTHING_OK)
+    renderStacks(stacks);
 
   freeStacks(stacks);
   return printErrorMessage(return_value);
