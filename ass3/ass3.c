@@ -97,7 +97,7 @@ int main(int argc, char **argv)
   ReturnValue return_value = readCardsFromPath(argv[1], stacks);
   if(return_value == EVERYTHING_OK)
   {
-    playLoop(stacks)
+    playLoop(stacks);
   }
   freeStacks(stacks);
   return printErrorMessage(return_value);
@@ -389,16 +389,16 @@ ReturnValue checkCards(char **input, int lines)
 
 ReturnValue addCardsToStacks(char **cards, CardStack **card_stack)
 {
-  int card = 0;
+  int card = 25;
   for(int round = 0; round < 4; round++)
   {
     for(int stack = GAME_STACK_1 + round; stack <= GAME_STACK_4; stack++)
     {
       addTop(card_stack[stack], cards[card][0], getCardValue(cards[card]));
-      card++;
+      card--;
     }
   }
-  for(;card < 26;card++)
+  for(int po_card = 0; po_card <= card; po_card++)
   {
     addTop(card_stack[PICK_OFF_STACK], cards[card][0], getCardValue(cards[card]));
   }
