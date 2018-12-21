@@ -105,6 +105,7 @@ int main(int argc, char **argv)
     playLoop(stacks);
   }
   freeStacks(stacks);
+  
   return printErrorMessage(return_value);
 }
 
