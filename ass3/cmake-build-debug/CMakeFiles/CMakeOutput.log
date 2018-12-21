@@ -26,25 +26,25 @@ The C compiler identification is MSVC, found in "C:/Users/Simon/CLionProjects/So
 Determining if the C compiler works passed with the following output:
 Change Dir: C:/Users/Simon/CLionProjects/Solitaer_C/ass3/cmake-build-debug/CMakeFiles/CMakeTmp
 
-Run Build Command:"nmake" "/nologo" "cmTC_48c6e\fast"
-	"C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\VC\Tools\MSVC\14.10.25017\bin\HostX86\x86\nmake.exe" -f CMakeFiles\cmTC_48c6e.dir\build.make /nologo -L                  CMakeFiles\cmTC_48c6e.dir\build
-Building C object CMakeFiles/cmTC_48c6e.dir/testCCompiler.c.obj
-	C:\PROGRA~2\MIB055~1\2017\COMMUN~1\VC\Tools\MSVC\1410~1.250\bin\HostX86\x86\cl.exe @C:\Users\Simon\AppData\Local\Temp\nmE0E2.tmp
+Run Build Command:"nmake" "/nologo" "cmTC_2c365\fast"
+	"C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\VC\Tools\MSVC\14.10.25017\bin\HostX86\x86\nmake.exe" -f CMakeFiles\cmTC_2c365.dir\build.make /nologo -L                  CMakeFiles\cmTC_2c365.dir\build
+Building C object CMakeFiles/cmTC_2c365.dir/testCCompiler.c.obj
+	C:\PROGRA~2\MIB055~1\2017\COMMUN~1\VC\Tools\MSVC\1410~1.250\bin\HostX86\x86\cl.exe @C:\Users\Simon\AppData\Local\Temp\nm666B.tmp
 testCCompiler.c
-Linking C executable cmTC_48c6e.exe
-	"C:\Program Files\JetBrains\CLion 2018.2.6\bin\cmake\win\bin\cmake.exe" -E vs_link_exe --intdir=CMakeFiles\cmTC_48c6e.dir --manifests  -- C:\PROGRA~2\MIB055~1\2017\COMMUN~1\VC\Tools\MSVC\1410~1.250\bin\HostX86\x86\link.exe /nologo @CMakeFiles\cmTC_48c6e.dir\objects1.rsp @C:\Users\Simon\AppData\Local\Temp\nmE131.tmp
+Linking C executable cmTC_2c365.exe
+	"C:\Program Files\JetBrains\CLion 2018.2.6\bin\cmake\win\bin\cmake.exe" -E vs_link_exe --intdir=CMakeFiles\cmTC_2c365.dir --manifests  -- C:\PROGRA~2\MIB055~1\2017\COMMUN~1\VC\Tools\MSVC\1410~1.250\bin\HostX86\x86\link.exe /nologo @CMakeFiles\cmTC_2c365.dir\objects1.rsp @C:\Users\Simon\AppData\Local\Temp\nm69F6.tmp
 
 
 Detecting C compiler ABI info compiled with the following output:
 Change Dir: C:/Users/Simon/CLionProjects/Solitaer_C/ass3/cmake-build-debug/CMakeFiles/CMakeTmp
 
-Run Build Command:"nmake" "/nologo" "cmTC_cc119\fast"
-	"C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\VC\Tools\MSVC\14.10.25017\bin\HostX86\x86\nmake.exe" -f CMakeFiles\cmTC_cc119.dir\build.make /nologo -L                  CMakeFiles\cmTC_cc119.dir\build
-Building C object CMakeFiles/cmTC_cc119.dir/CMakeCCompilerABI.c.obj
-	C:\PROGRA~2\MIB055~1\2017\COMMUN~1\VC\Tools\MSVC\1410~1.250\bin\HostX86\x86\cl.exe @C:\Users\Simon\AppData\Local\Temp\nmE43D.tmp
+Run Build Command:"nmake" "/nologo" "cmTC_39bc1\fast"
+	"C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\VC\Tools\MSVC\14.10.25017\bin\HostX86\x86\nmake.exe" -f CMakeFiles\cmTC_39bc1.dir\build.make /nologo -L                  CMakeFiles\cmTC_39bc1.dir\build
+Building C object CMakeFiles/cmTC_39bc1.dir/CMakeCCompilerABI.c.obj
+	C:\PROGRA~2\MIB055~1\2017\COMMUN~1\VC\Tools\MSVC\1410~1.250\bin\HostX86\x86\cl.exe @C:\Users\Simon\AppData\Local\Temp\nm6D03.tmp
 CMakeCCompilerABI.c
-Linking C executable cmTC_cc119.exe
-	"C:\Program Files\JetBrains\CLion 2018.2.6\bin\cmake\win\bin\cmake.exe" -E vs_link_exe --intdir=CMakeFiles\cmTC_cc119.dir --manifests  -- C:\PROGRA~2\MIB055~1\2017\COMMUN~1\VC\Tools\MSVC\1410~1.250\bin\HostX86\x86\link.exe /nologo @CMakeFiles\cmTC_cc119.dir\objects1.rsp @C:\Users\Simon\AppData\Local\Temp\nmE48C.tmp
+Linking C executable cmTC_39bc1.exe
+	"C:\Program Files\JetBrains\CLion 2018.2.6\bin\cmake\win\bin\cmake.exe" -E vs_link_exe --intdir=CMakeFiles\cmTC_39bc1.dir --manifests  -- C:\PROGRA~2\MIB055~1\2017\COMMUN~1\VC\Tools\MSVC\1410~1.250\bin\HostX86\x86\link.exe /nologo @CMakeFiles\cmTC_39bc1.dir\objects1.rsp @C:\Users\Simon\AppData\Local\Temp\nm6D61.tmp
 
 
 
@@ -52,13 +52,13 @@ Linking C executable cmTC_cc119.exe
 Detecting C [] compiler features compiled with the following output:
 Change Dir: C:/Users/Simon/CLionProjects/Solitaer_C/ass3/cmake-build-debug/CMakeFiles/CMakeTmp
 
-Run Build Command:"nmake" "/nologo" "cmTC_c6a61\fast"
-	"C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\VC\Tools\MSVC\14.10.25017\bin\HostX86\x86\nmake.exe" -f CMakeFiles\cmTC_c6a61.dir\build.make /nologo -L                  CMakeFiles\cmTC_c6a61.dir\build
-Building C object CMakeFiles/cmTC_c6a61.dir/feature_tests.c.obj
-	C:\PROGRA~2\MIB055~1\2017\COMMUN~1\VC\Tools\MSVC\1410~1.250\bin\HostX86\x86\cl.exe @C:\Users\Simon\AppData\Local\Temp\nmE779.tmp
+Run Build Command:"nmake" "/nologo" "cmTC_1ee69\fast"
+	"C:\Program Files (x86)\Microsoft Visual Studio\2017\Community\VC\Tools\MSVC\14.10.25017\bin\HostX86\x86\nmake.exe" -f CMakeFiles\cmTC_1ee69.dir\build.make /nologo -L                  CMakeFiles\cmTC_1ee69.dir\build
+Building C object CMakeFiles/cmTC_1ee69.dir/feature_tests.c.obj
+	C:\PROGRA~2\MIB055~1\2017\COMMUN~1\VC\Tools\MSVC\1410~1.250\bin\HostX86\x86\cl.exe @C:\Users\Simon\AppData\Local\Temp\nm7010.tmp
 feature_tests.c
-Linking C executable cmTC_c6a61.exe
-	"C:\Program Files\JetBrains\CLion 2018.2.6\bin\cmake\win\bin\cmake.exe" -E vs_link_exe --intdir=CMakeFiles\cmTC_c6a61.dir --manifests  -- C:\PROGRA~2\MIB055~1\2017\COMMUN~1\VC\Tools\MSVC\1410~1.250\bin\HostX86\x86\link.exe /nologo @CMakeFiles\cmTC_c6a61.dir\objects1.rsp @C:\Users\Simon\AppData\Local\Temp\nmE7D8.tmp
+Linking C executable cmTC_1ee69.exe
+	"C:\Program Files\JetBrains\CLion 2018.2.6\bin\cmake\win\bin\cmake.exe" -E vs_link_exe --intdir=CMakeFiles\cmTC_1ee69.dir --manifests  -- C:\PROGRA~2\MIB055~1\2017\COMMUN~1\VC\Tools\MSVC\1410~1.250\bin\HostX86\x86\link.exe /nologo @CMakeFiles\cmTC_1ee69.dir\objects1.rsp @C:\Users\Simon\AppData\Local\Temp\nm705F.tmp
 
 
     Feature record: C_FEATURE:1c_function_prototypes

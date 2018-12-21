@@ -101,13 +101,22 @@ int main(int argc, char **argv)
   initStacks(stacks);
 
   ReturnValue return_value = readCardsFromPath(argv[1], stacks);
-  if(return_value == EVERYTHING_OK)
+  renderStacks(stacks);
+  printf("\n");
+
+  move(stacks,4,'B', "3");
+
+  renderStacks(stacks);
+  freeStacks(stacks);
+  return 0;
+
+/*  if(return_value == EVERYTHING_OK)
   {
     playLoop(stacks);
   }
   freeStacks(stacks);
 
-  return printErrorMessage(return_value);
+  return printErrorMessage(return_value);*/
 }
 
 //------------------------------------------------------------------------------
@@ -140,6 +149,7 @@ void playLoop(CardStack **stacks)
       running = 0;
     else if((move = checkForMoveCommand(input)) != NULL)
     {
+
       free(move);
     }
     else
@@ -488,7 +498,7 @@ Card delTop(CardStack *stack)
 ReturnValue move(CardStack **stacks, StackType dest_stack, char color, char *value)
 {
   //1. Find the stack which holds the card
-  StackType src_stack;
+  StackType src_stack = 0;
 
   Card *move_card = mallocCheck(sizeof(Card *));
   move_card->color_ = color;
@@ -507,6 +517,7 @@ ReturnValue move(CardStack **stacks, StackType dest_stack, char color, char *val
     }
   }
 
+  printf(src_stack);
 
   free(move_card);
 
