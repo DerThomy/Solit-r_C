@@ -64,6 +64,8 @@ enum CardValue
 };
 
 void playLoop(CardStack **stacks);
+char **checkForMoveCommand(char *input);
+int checkForCardValue(char *input);
 char *getInput();
 void initStacks(CardStack **stacks);
 void freeStacks(CardStack **stacks);
@@ -110,6 +112,7 @@ void playLoop(CardStack **stacks)
 {
   char *input = NULL;
   int running = 1;
+  char **move = NULL;
   renderStacks(stacks);
   do
   {
@@ -126,10 +129,79 @@ void playLoop(CardStack **stacks)
     }
     else if(!strcmp(input, "exit\n"))
       running = 0;
+    else if((move = checkForMoveCommand(input)) != NULL) 
+      printf("correct move\n");
     else
       printf("[INFO] Invalid command!\n");
     free(input);
+    if(move != NULL)
+      free(move);
   } while(running);
+}
+
+char **checkForMoveCommand(char *input)
+{
+  char *move, *col, *val, *to, *dest;
+  char **move_command = mallocCheck(sizeof(char *) * 3);
+  int return_null = 0;
+  if(input != NULL)
+    move = strtok(input, " ");
+  else
+    return_null = 1;
+  if(move != NULL && !strcmp(move, "move"))
+  {
+    col = strtok(NULL, " ");
+    if(col != NULL && (!strcmp(col,"r") || !strcmp(col,"b")))
+    {
+      move_command[0] = col;
+      val = strtok(NULL, " ");
+      if(checkForCardValue(val))
+      {
+        move_command[1] = val;
+        to = strtok(NULL, " ");
+        if(to != NULL && !strcmp(to, "to"))
+        {
+          dest = strtok(NULL, "\n");
+          if(dest != NULL && strlen(dest) == 1 && dest[0] >= '0' && dest[0] <= '6')
+          {
+            move_command[2] = dest;
+          }
+          else 
+            return_null = 1;
+        }
+        else 
+          return_null = 1;
+      }
+      else 
+        return_null = 1;
+    }
+    else 
+      return_null = 1;
+  }
+  else 
+    return_null = 1;
+  if(return_null)
+  {
+    free(move_command);
+    return NULL;
+  }
+  return move_command;
+}
+
+int checkForCardValue(char *input)
+{
+  if(input == NULL)
+    return 0;
+  if(strlen(input) <= 2 && strlen(input) > 0)
+  {
+    if(!strcmp(input, "a") || !strcmp(input, "k") || !strcmp(input, "q") || !strcmp(input, "j"))
+      return 1;
+    else if(strlen(input) == 1 && isdigit(input[0]) && strcmp(input, "1"))
+      return 1;
+    else if(!strcmp(input, "10"))
+      return 1;
+  }
+  return 0;
 }
 
 char *getInput()
@@ -138,34 +210,34 @@ char *getInput()
   int count = 0;
   int trimmed = 0;
   int realloced = 1;
-  int ch;
-  while((ch = getchar()) != '\n' && ch != EOF)
+  int ch = getchar();
+  while(ch != '\n' && ch != EOF)
   {
     if(!isspace(ch) || trimmed)
     {
       trimmed = 1;
       if(!isspace(ch))
       {
-        input[count++] = ch;
-        if(count + 1 > sizeof(char) * 20 * realloced)
-          input = realloc(input, sizeof(char) * 20 * ++realloced);
+        input[count] = ch;
+        ch = getchar();
       }
       else
       {
-        ch = getchar();
-        while(isspace(ch) && ch != '\n')
+        do{
           ch = getchar();
+        } while(isspace(ch) && ch != '\n');
       	if(ch == '\n' || ch == EOF)
           break;
         else
         {
           input[count] = ' ';
-          if(++count + 2 > sizeof(char) * 20 * realloced)
-            input = realloc(input, sizeof(char) * 20 * ++realloced);
-          input[count] = ch;
         }
       }
+      if(++count + 2 > sizeof(char) * 20 * realloced)
+        input = realloc(input, sizeof(char) * 20 * ++realloced);
     }
+    else 
+      ch = getchar();
   }
   input[count] = '\n';
   input[count + 1] = '\0';
