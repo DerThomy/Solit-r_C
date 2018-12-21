@@ -1,4 +1,4 @@
-/snap/clion/56/bin/cmake/linux/bin/cmake -DCMAKE_BUILD_TYPE=Debug -G "CodeBlocks - Unix Makefiles" /home/lena/Documents/Uni/1.Semester/ESP/Solitaer_C/ass3
+/snap/clion/57/bin/cmake/linux/bin/cmake -DCMAKE_BUILD_TYPE=Debug -G "CodeBlocks - Unix Makefiles" /home/lena/Documents/Uni/1.Semester/ESP/Solitaer_C/ass3
 -- The C compiler identification is GNU 7.3.0
 -- Check for working C compiler: /usr/bin/cc
 -- Check for working C compiler: /usr/bin/cc -- works

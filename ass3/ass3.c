@@ -34,7 +34,8 @@ typedef enum _StackType_
   GAME_STACK_3 = 3,
   GAME_STACK_4 = 4,
   DEPOSIT_STACK_1 = 5,
-  DEPOSIT_STACK_2 = 6
+  DEPOSIT_STACK_2 = 6,
+  MOVE_STACK = 7
 } StackType;
 
 //Stores Card
@@ -75,7 +76,8 @@ void copyCard(Card *dest, Card *src);
 void freeCard(Card *s);
 void addTop(CardStack *stack, char color, char *value);
 Card delTop(CardStack *stack);
-Card *FindCard(CardStack *stack, Card *spec_card);
+Card *findCard(CardStack *stack, Card *spec_card);
+ReturnValue moveStack(CardStack *dest_stack, CardStack *src_stack, char color, char *value);
 void printCard(Card *card);
 ReturnValue readCardsFromPath(char *path, CardStack **card_stack);
 ReturnValue readCardsFromFile(FILE *file, CardStack **card_stack);
@@ -172,7 +174,7 @@ char *getInput()
 
 void initStacks(CardStack **stacks)
 {
-    for(int stack = 0; stack < 7; stack++)
+  for(int stack = 0; stack < 7; stack++)
   {
     stacks[stack] = mallocCheck(sizeof(CardStack));
     stacks[stack]->top_card = NULL;
@@ -304,12 +306,63 @@ Card delTop(CardStack *stack)
 
   old_top->next->prev = NULL;
   stack->top_card = old_top->next;       // move top card down
+  if(stack->top_card->next == NULL)
+  {
+    stack->bottom_card = stack->top_card;
+  }
   free(old_top);              // now we can free the old card
   return copy_old_top;                // and return the card we remembered
 }
 
+
+ReturnValue moveStack(CardStack *dest_stack, CardStack *src_stack, char color, char *value)
+{
+  //Muss noch überprüft werden, ob wirklich eine Kopie des Stapels erzeugt wird.
+  // Kopiert derzeit nur den Stapel und löscht ihn aus dem alten.
+  Card *copy_bottom = mallocCheck(sizeof(Card *));
+  copy_bottom = src_stack->bottom_card;
+
+  while(copy_bottom->prev != NULL) //finds the card which prev card is the start of the moving stack
+  {
+    if(copy_bottom->prev->value == value && copy_bottom->prev->color == color)
+    {
+      break;
+    }
+    copy_bottom = copy_bottom->prev;
+  }
+
+  CardStack *move_stack = mallocCheck(sizeof(CardStack *)); //creates a stack which will hold the moving stack
+  move_stack->stack_type = MOVE_STACK;
+  move_stack->bottom_card = copy_bottom->prev;
+  move_stack->bottom_card->next = NULL;
+  move_stack->top_card = src_stack->top_card;
+
+  Card *copy_top = mallocCheck(sizeof(Card *));
+  copy_top = move_stack->top_card;
+  while(copy_top->next != NULL)
+  {
+    if(copy_top->next->value == value && copy_top->next->color == color)
+    {
+      break;
+    }
+    copy_top = copy_top->next;
+  }
+  if(copy_top->next->next != NULL)
+  {
+    copy_top->next->next = NULL;
+  }
+
+  copy_bottom->prev = NULL;
+  src_stack->top_card = copy_bottom;
+  freeStacks(&move_stack);
+  free(copy_bottom);
+  free(copy_top);
+
+  return EVERYTHING_OK;
+}
+
 //Searches for a specific card
-Card *FindCard(CardStack *stack, Card *spec_card)
+Card *findCard(CardStack *stack, Card *spec_card)
 {
    Card *old_top = stack->top_card;
    while(old_top->next != NULL)
