@@ -1,3 +1,3 @@
-/home/lena/Documents/Uni/1.Semester/ESP/Solitaer_C/ass3/cmake-build-debug/CMakeFiles/rebuild_cache.dir
-/home/lena/Documents/Uni/1.Semester/ESP/Solitaer_C/ass3/cmake-build-debug/CMakeFiles/ass3.dir
-/home/lena/Documents/Uni/1.Semester/ESP/Solitaer_C/ass3/cmake-build-debug/CMakeFiles/edit_cache.dir
+C:/Users/Simon/CLionProjects/Solitaer_C/ass3/cmake-build-debug/CMakeFiles/ass3.dir
+C:/Users/Simon/CLionProjects/Solitaer_C/ass3/cmake-build-debug/CMakeFiles/edit_cache.dir
+C:/Users/Simon/CLionProjects/Solitaer_C/ass3/cmake-build-debug/CMakeFiles/rebuild_cache.dir

@@ -1,7 +1,9 @@
 file(REMOVE_RECURSE
-  "CMakeFiles/ass3.dir/ass3.c.o"
+  "CMakeFiles/ass3.dir/ass3.c.obj"
   "ass3.pdb"
-  "ass3"
+  "ass3.exe"
+  "ass3.exe.manifest"
+  "ass3.lib"
 )
 
 # Per-language clean rules from dependency scanning.

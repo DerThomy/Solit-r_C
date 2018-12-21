@@ -71,7 +71,7 @@ void copyCard(Card *dest, Card *src);
 void addTop(CardStack *stack, char color, char *value);
 Card delTop(CardStack *stack);
 Card *findCard(CardStack *stack, Card *spec_card);
-ReturnValue moveStack(CardStack *dest_stack, CardStack *src_stack, char color, char *value);
+ReturnValue move(CardStack **stacks, StackType dest_stack, char color, char *value);
 void printCard(Card *card);
 ReturnValue readCardsFromPath(char *path, CardStack **stacks);
 ReturnValue readCardsFromFile(FILE *file, CardStack **stacks);
@@ -485,9 +485,35 @@ Card delTop(CardStack *stack)
   return copy_old_top;                // and return the card we remembered
 }
 
-ReturnValue moveStack(CardStack *dest_stack, CardStack *src_stack, char color, char *value)
+ReturnValue move(CardStack **stacks, StackType dest_stack, char color, char *value)
 {
-  //Muss noch überprüft werden, ob wirklich eine Kopie des Stapels erzeugt wird.
+  //1. Find the stack which holds the card
+  StackType src_stack;
+
+  Card *move_card = mallocCheck(sizeof(Card *));
+  move_card->color_ = color;
+  move_card->value_ = value;
+
+  if(stacks[PICK_OFF_STACK]->top_card_->value_ == value && stacks[PICK_OFF_STACK]->top_card_->color_ == color)
+  {
+    src_stack = PICK_OFF_STACK;
+  }
+
+  for(int a = 1; a < 7; a++)
+  {
+    if(findCard(stacks[a],move_card) != NULL)
+    {
+      src_stack = a;
+    }
+  }
+
+
+  free(move_card);
+
+
+//region Description
+
+/*//Muss noch überprüft werden, ob wirklich eine Kopie des Stapels erzeugt wird.
   // Kopiert derzeit nur den Stapel und löscht ihn aus dem alten.
   Card *copy_bottom = mallocCheck(sizeof(Card *));
   copy_bottom = src_stack->bottom_card_;
@@ -526,7 +552,8 @@ ReturnValue moveStack(CardStack *dest_stack, CardStack *src_stack, char color, c
   src_stack->top_card_ = copy_bottom;
   freeStacks(&move_stack);
   free(copy_bottom);
-  free(copy_top);
+  free(copy_top);*/
+//endregion
 
   return EVERYTHING_OK;
 }
@@ -543,11 +570,10 @@ ReturnValue moveStack(CardStack *dest_stack, CardStack *src_stack, char color, c
 Card *findCard(CardStack *stack, Card *spec_card)
 {
    Card *old_top = stack->top_card_;
-   while(old_top->next_ != NULL)
+   while(old_top != NULL)
    {
      if(old_top->color_ == spec_card->color_ && old_top->value_ == spec_card->value_ )
      {
-       //if a matching card is found, the whole stack starting with the specific card will be returned
        copyCard(spec_card, old_top);
        return spec_card;
      }
