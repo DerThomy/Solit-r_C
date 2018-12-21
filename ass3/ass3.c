@@ -134,35 +134,39 @@ char *getInput()
 {
   char *input = malloc(sizeof(char) * 20);
   int count = 0;
-  int space_added = 0;
   int trimmed = 0;
   int realloced = 1;
   int ch;
   while((ch = getchar()) != '\n' && ch != EOF)
   {
-    if(ch != ' ' || trimmed)
+    if(!isspace(ch) || trimmed)
     {
       trimmed = 1;
-      if(ch != ' ')
+      if(!isspace(ch))
       {
-        printf("%c", ch);
-        input[count] = ch;
-        space_added = 0;
+        input[count++] = ch;
+        if(count + 1 > sizeof(char) * 20 * realloced)
+          input = realloc(input, sizeof(char) * 20 * ++realloced);
       }
-      else if(!space_added)
+      else
       {
-        printf("%c", ch);
-        
-        input[count] = ' ';
-        space_added = 1;
+        ch = getchar();
+        while(isspace(ch) && ch != '\n')
+          ch = getchar();
+      	if(ch == '\n' || ch == EOF)
+          break;
+        else
+        {
+          input[count] = ' ';
+          if(++count + 2 > sizeof(char) * 20 * realloced)
+            input = realloc(input, sizeof(char) * 20 * ++realloced);
+          input[count] = ch;
+        }
       }
     }
-    if(++count + 1 > sizeof(char) * 20 * realloced)
-      input = realloc(input, sizeof(char) * 20 * ++realloced);
   }
   input[count] = '\n';
   input[count + 1] = '\0';
-  printf("%c", input[count + 1]);
   return input;
 }
 
