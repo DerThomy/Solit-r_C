@@ -26,6 +26,7 @@ typedef enum _ReturnValue_
   INVALID_FILE = 3
 } ReturnValue;
 
+//Array position of Stacks
 typedef enum _StackType_
 {
   PICK_OFF_STACK = 0,
@@ -39,29 +40,21 @@ typedef enum _StackType_
 } StackType;
 
 //Stores Card
-typedef struct Card_
+typedef struct _Card_
 {
-  char color;
-  char *value;
-  struct Card_ *next;
-  struct Card_ *prev;
+  char color_;
+  char *value_;
+  struct _Card_ *next_;
+  struct _Card_ *prev_;
 }Card;
 
 //Stores a card stack and which type of stack it is (e.g. GameStack)
 typedef struct CardStack_
 {
-  struct Card_ *top_card; //the stack of cards
-  struct Card_ *bottom_card;
-  char *stack_type;
+  struct _Card_ *top_card_;
+  struct _Card_ *bottom_card_;
+  int stack_type_;
 }CardStack;
-
-enum CardValue
-{
-   A = 1,
-   J = 11,
-   Q = 12,
-   K = 13
-};
 
 void playLoop(CardStack **stacks);
 char **checkForMoveCommand(char *input);
@@ -75,20 +68,28 @@ void printPickOffStack(Card *card);
 void printOtherStacks(Card *card, int stack);
 void *mallocCheck(size_t size);
 void copyCard(Card *dest, Card *src);
-void freeCard(Card *s);
 void addTop(CardStack *stack, char color, char *value);
 Card delTop(CardStack *stack);
 Card *findCard(CardStack *stack, Card *spec_card);
 ReturnValue moveStack(CardStack *dest_stack, CardStack *src_stack, char color, char *value);
 void printCard(Card *card);
-ReturnValue readCardsFromPath(char *path, CardStack **card_stack);
-ReturnValue readCardsFromFile(FILE *file, CardStack **card_stack);
+ReturnValue readCardsFromPath(char *path, CardStack **stacks);
+ReturnValue readCardsFromFile(FILE *file, CardStack **stacks);
 ReturnValue checkCards(char **input, int lines);
-ReturnValue addCardsToStacks(char **cards, CardStack **card_stack);
+ReturnValue addCardsToStacks(char **cards, CardStack **stacks);
 char *getCardValue(char *card);
 char *copyString(char *string);
 ReturnValue printErrorMessage(ReturnValue return_value);
 
+//------------------------------------------------------------------------------
+///
+/// Entry function of the program for ass3
+///
+/// @param argc number of arguments
+/// @param argv program arguments
+///
+/// @return value of ReturnValue which defines type of error
+//
 int main(int argc, char **argv)
 {
   if(argc != 2)
@@ -105,10 +106,17 @@ int main(int argc, char **argv)
     playLoop(stacks);
   }
   freeStacks(stacks);
-  
+
   return printErrorMessage(return_value);
 }
 
+//------------------------------------------------------------------------------
+///
+/// Main game loop. Gets user input and renders gameboard until exit
+///
+/// @param stacks all the seven game stacks
+///
+//
 void playLoop(CardStack **stacks)
 {
   char *input = NULL;
@@ -130,16 +138,24 @@ void playLoop(CardStack **stacks)
     }
     else if(!strcmp(input, "exit\n"))
       running = 0;
-    else if((move = checkForMoveCommand(input)) != NULL) 
-      printf("correct move\n");
+    else if((move = checkForMoveCommand(input)) != NULL)
+    {
+      free(move);
+    }
     else
       printf("[INFO] Invalid command!\n");
     free(input);
-    if(move != NULL)
-      free(move);
   } while(running);
 }
 
+//------------------------------------------------------------------------------
+///
+/// Checks the user input for a valid move command
+///
+/// @param input input of the user
+///
+/// @return char ** with all the move parameters or null if failed
+//
 char **checkForMoveCommand(char *input)
 {
   char *move, *col, *val, *to, *dest;
@@ -189,6 +205,14 @@ char **checkForMoveCommand(char *input)
   return move_command;
 }
 
+//------------------------------------------------------------------------------
+///
+/// Checks the input string for a valid card value
+///
+/// @param input string to be tested
+///
+/// @return 0 if no valid value or 1 if valid
+//
 int checkForCardValue(char *input)
 {
   if(input == NULL)
@@ -205,6 +229,12 @@ int checkForCardValue(char *input)
   return 0;
 }
 
+//------------------------------------------------------------------------------
+///
+/// Gets the input of the user for commands (help, exit, move)
+///
+/// @return string with user input
+//
 char *getInput()
 {
   char *input = malloc(sizeof(char) * 20);
@@ -245,25 +275,40 @@ char *getInput()
   return input;
 }
 
+//------------------------------------------------------------------------------
+///
+/// mallocs all seven game stacks and sets default values
+///
+/// @param stacks all seven game stacks
+///
+//
 void initStacks(CardStack **stacks)
 {
   for(int stack = 0; stack < 7; stack++)
   {
     stacks[stack] = mallocCheck(sizeof(CardStack));
-    stacks[stack]->top_card = NULL;
-    stacks[stack]->bottom_card = NULL;
+    stacks[stack]->top_card_ = NULL;
+    stacks[stack]->bottom_card_ = NULL;
+    stacks[stack]->stack_type_ = stack;
   }
 }
 
+//------------------------------------------------------------------------------
+///
+/// frees all stacks given to it
+///
+/// @param stacks list of stacks
+///
+//
 void freeStacks(CardStack **stacks)
 {
   for(int stack = 0; stack < 7; stack++)
   {
     Card *next = NULL;
-    for(Card *card = stacks[stack]->top_card; card != NULL; card = next)
+    for(Card *card = stacks[stack]->top_card_; card != NULL; card = next)
     {
-      next = card->next;
-      free(card->value);
+      next = card->next_;
+      free(card->value_);
       free(card);
     }
     free(stacks[stack]);
@@ -271,6 +316,13 @@ void freeStacks(CardStack **stacks)
   free(stacks);
 }
 
+//------------------------------------------------------------------------------
+///
+/// frees all stacks given to it
+///
+/// @param stacks list of stacks
+///
+//
 void renderStacks(CardStack **stacks)
 {
   printf("0   | 1   | 2   | 3   | 4   | DEP | DEP\n");
@@ -278,9 +330,16 @@ void renderStacks(CardStack **stacks)
   printRows(stacks);
 }
 
+//------------------------------------------------------------------------------
+///
+/// prints all rows of the gaming board
+///
+/// @param stacks all seven gaming stacks
+///
+//
 void printRows(CardStack **stacks)
 {
-  Card *pick_off_card = stacks[PICK_OFF_STACK]->bottom_card;
+  Card *pick_off_card = stacks[PICK_OFF_STACK]->bottom_card_;
   Card **other_stacks_cards = malloc(sizeof(Card *) * 7);
   for(int row = 0; row < 16; row++)
   {
@@ -288,33 +347,48 @@ void printRows(CardStack **stacks)
     for(int stack = GAME_STACK_1; stack <= DEPOSIT_STACK_2; stack++)
     {
       if(row == 0)
-        other_stacks_cards[stack] = stacks[stack]->bottom_card;
+        other_stacks_cards[stack] = stacks[stack]->bottom_card_;
       else
-        other_stacks_cards[stack] = other_stacks_cards[stack] == NULL ? NULL : other_stacks_cards[stack]->prev;
+        other_stacks_cards[stack] = other_stacks_cards[stack] == NULL ? NULL : other_stacks_cards[stack]->prev_;
       printOtherStacks(other_stacks_cards[stack], stack);
     }
     printf("\n");
-    pick_off_card = pick_off_card == NULL ? NULL : pick_off_card->prev;
+    pick_off_card = pick_off_card == NULL ? NULL : pick_off_card->prev_;
   }
   free(other_stacks_cards);
 }
 
+//------------------------------------------------------------------------------
+///
+/// prints cell the PickOffStack in a row
+///
+/// @param card card to be printed
+///
+//
 void printPickOffStack(Card *card)
 {
   if(card != NULL)
   {
-    if(card->prev != NULL)
+    if(card->prev_ != NULL)
       printf("X   ");
     else
     {
       printCard(card);
-      strlen(card->value) > 1 ? printf(" ") : printf("  ");
+      strlen(card->value_) > 1 ? printf(" ") : printf("  ");
     }
   }
   else
     printf("    ");
 }
 
+//------------------------------------------------------------------------------
+///
+/// prints cells of the other Stacks in a row
+///
+/// @param card card to be printed
+/// @param stack indicates which stack (look at struct _StackTypes_)
+///
+//
 void printOtherStacks(Card *card, int stack)
 {
   printf("| ");
@@ -322,15 +396,22 @@ void printOtherStacks(Card *card, int stack)
     {
       printCard(card);
       if(stack != DEPOSIT_STACK_2)
-        strlen(card->value) > 1 ? printf(" ") : printf("  ");
+        strlen(card->value_) > 1 ? printf(" ") : printf("  ");
       else
-        if(strlen(card->value) == 1)
+        if(strlen(card->value_) == 1)
           printf(" ");
     }
     else
       stack == DEPOSIT_STACK_2 ? printf("   ") : printf("    ");
 }
 
+//------------------------------------------------------------------------------
+///
+/// mallocs the given size and checks if memory is full (null ptr given back)
+///
+/// @param size size to be malloced
+///
+//
 void *mallocCheck(size_t size)
 {
   void *buffer = malloc(size);
@@ -339,94 +420,110 @@ void *mallocCheck(size_t size)
   return buffer;
 }
 
+//------------------------------------------------------------------------------
+///
+/// copies the values of one card to another
+///
+/// @param dest destination card
+/// @param src source card
+///
+//
 void copyCard(Card *dest, Card *src)
 {
-  dest->color = src->color;
-  dest->value = src->value;
+  dest->color_ = src->color_;
+  dest->value_ = src->value_;
 }
 
-void freeCard(Card *s)
-{
-  //So nicht möglich, da wir mit stacks arbeiten
-  //free(s->next);
-}
-
-//Adds new card to the top
+//------------------------------------------------------------------------------
+///
+/// add card to the beginning of a card stack
+///
+/// @param stack stack to be added to
+/// @param color color of card
+/// @param value value of card
+///
+//
 void addTop(CardStack *stack, char color, char *value)
 {
   // make new card and copy data to it:
   Card *new_card = mallocCheck(sizeof(Card));
-  new_card->color = color;
-  new_card->value = value;
+  new_card->color_ = color;
+  new_card->value_ = value;
 
-  Card *old_top = stack->top_card;
-  new_card->next = old_top;    // next points to previous top card
-  new_card->prev = NULL;
+  Card *old_top = stack->top_card_;
+  new_card->next_ = old_top;    // next points to previous top card
+  new_card->prev_ = NULL;
   if(old_top != NULL)
-    old_top->prev = new_card;
+    old_top->prev_ = new_card;
   else
-    stack->bottom_card = new_card;
-  stack->top_card = new_card; // top now points to new card
+    stack->bottom_card_ = new_card;
+  stack->top_card_ = new_card; // top now points to new card
 }
 
-//Deletes top card
+//------------------------------------------------------------------------------
+///
+/// deletes top card of stack and gives it back
+///
+/// @param stack stack of which the top card should be deleted
+///
+/// @return card that was deleted
+//
 Card delTop(CardStack *stack)
 {
-  Card *old_top = stack->top_card;  // remember the old top card
+  Card *old_top = stack->top_card_;  // remember the old top card
 
   Card copy_old_top;
   copyCard(&copy_old_top, old_top);
 
-  old_top->next->prev = NULL;
-  stack->top_card = old_top->next;       // move top card down
-  if(stack->top_card->next == NULL)
+  old_top->next_->prev_ = NULL;
+  stack->top_card_ = old_top->next_;       // move top card down
+  if(stack->top_card_->next_ == NULL)
   {
-    stack->bottom_card = stack->top_card;
+    stack->bottom_card_ = stack->top_card_;
   }
   free(old_top);              // now we can free the old card
   return copy_old_top;                // and return the card we remembered
 }
-
 
 ReturnValue moveStack(CardStack *dest_stack, CardStack *src_stack, char color, char *value)
 {
   //Muss noch überprüft werden, ob wirklich eine Kopie des Stapels erzeugt wird.
   // Kopiert derzeit nur den Stapel und löscht ihn aus dem alten.
   Card *copy_bottom = mallocCheck(sizeof(Card *));
-  copy_bottom = src_stack->bottom_card;
+  copy_bottom = src_stack->bottom_card_;
 
-  while(copy_bottom->prev != NULL) //finds the card which prev card is the start of the moving stack
+  while(copy_bottom->prev_ != NULL) //finds the card which prev card is the start of the moving stack
   {
-    if(copy_bottom->prev->value == value && copy_bottom->prev->color == color)
+    if(copy_bottom->prev_->value_ == value && copy_bottom->prev_->color_ == color)
     {
       break;
     }
-    copy_bottom = copy_bottom->prev;
+    copy_bottom = copy_bottom->prev_;
   }
 
   CardStack *move_stack = mallocCheck(sizeof(CardStack *)); //creates a stack which will hold the moving stack
-  move_stack->stack_type = MOVE_STACK;
-  move_stack->bottom_card = copy_bottom->prev;
-  move_stack->bottom_card->next = NULL;
-  move_stack->top_card = src_stack->top_card;
+  move_stack->stack_type_ = MOVE_STACK;
+  move_stack->bottom_card_ = copy_bottom->prev_;
+  move_stack->bottom_card_->next_ = NULL;
+  move_stack->top_card_ = src_stack->top_card_;
 
   Card *copy_top = mallocCheck(sizeof(Card *));
-  copy_top = move_stack->top_card;
-  while(copy_top->next != NULL)
+  copy_top = move_stack->top_card_;
+  while(copy_top->next_ != NULL)
   {
-    if(copy_top->next->value == value && copy_top->next->color == color)
+    if(copy_top->next_->value_ == value && copy_top->next_->color_ == color)
     {
       break;
     }
-    copy_top = copy_top->next;
+    copy_top = copy_top->next_;
   }
-  if(copy_top->next->next != NULL)
+  if(copy_top->next_->next_ != NULL)
   {
-    copy_top->next->next = NULL;
+    copy_top->next_->next_ = NULL;
   }
 
-  copy_bottom->prev = NULL;
-  src_stack->top_card = copy_bottom;
+  copy_bottom->prev_ = NULL;
+  src_stack->top_card_ = copy_bottom;
   freeStacks(&move_stack);
   free(copy_bottom);
   free(copy_top);
@@ -434,44 +531,77 @@ ReturnValue moveStack(CardStack *dest_stack, CardStack *src_stack, char color, c
   return EVERYTHING_OK;
 }
 
-//Searches for a specific card
+//------------------------------------------------------------------------------
+///
+/// finds a card in a given stack
+///
+/// @param stack stack to search in
+/// @param spec_card card to be searched
+///
+/// @return searched card or null if not found
+//
 Card *findCard(CardStack *stack, Card *spec_card)
 {
-   Card *old_top = stack->top_card;
-   while(old_top->next != NULL)
+   Card *old_top = stack->top_card_;
+   while(old_top->next_ != NULL)
    {
-     if(old_top->color == spec_card->color && old_top->value == spec_card->value )
+     if(old_top->color_ == spec_card->color_ && old_top->value_ == spec_card->value_ )
      {
        //if a matching card is found, the whole stack starting with the specific card will be returned
        copyCard(spec_card, old_top);
        return spec_card;
      }
-     old_top = old_top->next; //move one card down
+     old_top = old_top->next_; //move one card down
    }
 
   return NULL;
 }
 
+//------------------------------------------------------------------------------
+///
+/// prints a given cards value and color (e.g. BLACK 10 -> B10)
+///
+/// @param card card to be printed
+///
+//
 void printCard(Card *card)
 {
-  if(card->color != '\0' && card->value != NULL)
-    printf("%c%s", card->color, card->value);
+  if(card->color_ != '\0' && card->value_ != NULL)
+    printf("%c%s", card->color_, card->value_);
 }
 
-ReturnValue readCardsFromPath(char *path, CardStack **card_stack)
+//------------------------------------------------------------------------------
+///
+/// reads the cards from given path
+///
+/// @param path string with path
+/// @param stacks all seven card stacks
+///
+/// @return error type or 0 for success
+//
+ReturnValue readCardsFromPath(char *path, CardStack **stacks)
 {
   FILE *file = fopen(path, "r");
   if(file == NULL)
   {
     return INVALID_FILE;
   }
-  ReturnValue read_return_value = readCardsFromFile(file, card_stack);
+  ReturnValue read_return_value = readCardsFromFile(file, stacks);
 
   fclose(file);
   return read_return_value;
 }
 
-ReturnValue readCardsFromFile(FILE *file, CardStack **card_stack)
+//------------------------------------------------------------------------------
+///
+/// reads all the cards from a given file
+///
+/// @param file file with cards
+/// @param stacks all seven card stacks
+///
+/// @return error type or 0 for success
+//
+ReturnValue readCardsFromFile(FILE *file, CardStack **stacks)
 {
   char **cards = mallocCheck(27*8);
   char *line;
@@ -506,13 +636,22 @@ ReturnValue readCardsFromFile(FILE *file, CardStack **card_stack)
       break;
   }
   return_value = return_value == EVERYTHING_OK ? checkCards(cards, line_counter) : return_value;
-  return_value = return_value == EVERYTHING_OK ? addCardsToStacks(cards, card_stack) : return_value;
+  return_value = return_value == EVERYTHING_OK ? addCardsToStacks(cards, stacks) : return_value;
   for(int li = 0; li < line_counter; li++)
       free(cards[li]);
   free(cards);
   return return_value;
 }
 
+//------------------------------------------------------------------------------
+///
+/// checks if all cards are correctly given (e.g. no doubles, too many / few, etc)
+///
+/// @param input all cards in strings
+/// @param lines number of lines / cards
+///
+/// @return error type or 0 for success
+//
 ReturnValue checkCards(char **input, int lines)
 {
   if(lines < 26 || lines > 26)
@@ -554,24 +693,41 @@ ReturnValue checkCards(char **input, int lines)
   return included_counter == 26 ? EVERYTHING_OK : INVALID_FILE;
 }
 
-ReturnValue addCardsToStacks(char **cards, CardStack **card_stack)
+//------------------------------------------------------------------------------
+///
+/// adds all cards from file to the game stacks (following given rules)
+///
+/// @param cards all cards in given order
+/// @param stacks all seven game stacks
+///
+/// @return error type or 0 for success
+//
+ReturnValue addCardsToStacks(char **cards, CardStack **stacks)
 {
   int card = 25;
   for(int round = 0; round < 4; round++)
   {
     for(int stack = GAME_STACK_1 + round; stack <= GAME_STACK_4; stack++)
     {
-      addTop(card_stack[stack], cards[card][0], getCardValue(cards[card]));
+      addTop(stacks[stack], cards[card][0], getCardValue(cards[card]));
       card--;
     }
   }
   for(int po_card = 0; po_card <= card; po_card++)
   {
-    addTop(card_stack[PICK_OFF_STACK], cards[card][0], getCardValue(cards[card]));
+    addTop(stacks[PICK_OFF_STACK], cards[card][0], getCardValue(cards[card]));
   }
   return EVERYTHING_OK;
 }
 
+//------------------------------------------------------------------------------
+///
+/// gets the value from a card given as string
+///
+/// @param card card from which to get the value
+///
+/// @return card value (string because of the possibility of "10")
+//
 char *getCardValue(char *card)
 {
   switch(card[0])
@@ -587,6 +743,14 @@ char *getCardValue(char *card)
   }
 }
 
+//------------------------------------------------------------------------------
+///
+/// Copys a string and gives it back (WARNING: RETURN STRING HAS TO BE FREED!!!)
+///
+/// @param string string to be copied
+///
+/// @return copied string (malloced)
+//
 char *copyString(char *string)
 {
   char *copy = malloc(sizeof(string));
