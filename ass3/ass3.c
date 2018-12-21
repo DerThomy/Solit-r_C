@@ -70,7 +70,7 @@ void *mallocCheck(size_t size);
 void copyCard(Card *dest, Card *src);
 void addTop(CardStack *stack, char color, char *value);
 Card delTop(CardStack *stack);
-Card *findCard(CardStack *stack, Card *spec_card);
+int findCard(CardStack *stack, Card *spec_card);
 ReturnValue move(CardStack **stacks, StackType dest_stack, char color, char *value);
 void printCard(Card *card);
 ReturnValue readCardsFromPath(char *path, CardStack **stacks);
@@ -441,7 +441,7 @@ void *mallocCheck(size_t size)
 void copyCard(Card *dest, Card *src)
 {
   dest->color_ = src->color_;
-  dest->value_ = src->value_;
+  dest->value_ = copyString(src->value_);
 }
 
 //------------------------------------------------------------------------------
@@ -504,67 +504,32 @@ ReturnValue move(CardStack **stacks, StackType dest_stack, char color, char *val
   move_card->color_ = color;
   move_card->value_ = value;
 
-  if(stacks[PICK_OFF_STACK]->top_card_->value_ == value && stacks[PICK_OFF_STACK]->top_card_->color_ == color)
+  int position = 0;
+  if((*stacks[PICK_OFF_STACK]->top_card_->value_ == *value) && (stacks[PICK_OFF_STACK]->top_card_->color_ == color))
   {
     src_stack = PICK_OFF_STACK;
   }
-
-  for(int a = 1; a < 7; a++)
+  else
   {
-    if(findCard(stacks[a],move_card) != NULL)
+    for(int a = 1; a < 7; a++)
     {
-      src_stack = a;
+      position = findCard(stacks[a],move_card);
+      if(position != 0)
+      {
+        src_stack = a;
+      }
     }
   }
 
-  printf(src_stack);
+ // printf("%s\n", stacks[src_stack]->top_card_[1].next_->value_);
+  //2. Copy the cards that will be moved
+  //Find the position of the card in the specific stack
+  move_card->next_ = NULL;
+  move_card->prev_ = stacks[src_stack]->top_card_[position].prev_;
+  //3. Delete the cards from src_stack from top_card and bottom_card
+  stacks[src_stack]->top_card_[position].prev_;
 
   free(move_card);
-
-
-//region Description
-
-/*//Muss noch überprüft werden, ob wirklich eine Kopie des Stapels erzeugt wird.
-  // Kopiert derzeit nur den Stapel und löscht ihn aus dem alten.
-  Card *copy_bottom = mallocCheck(sizeof(Card *));
-  copy_bottom = src_stack->bottom_card_;
-
-  while(copy_bottom->prev_ != NULL) //finds the card which prev card is the start of the moving stack
-  {
-    if(copy_bottom->prev_->value_ == value && copy_bottom->prev_->color_ == color)
-    {
-      break;
-    }
-    copy_bottom = copy_bottom->prev_;
-  }
-
-  CardStack *move_stack = mallocCheck(sizeof(CardStack *)); //creates a stack which will hold the moving stack
-  move_stack->stack_type_ = MOVE_STACK;
-  move_stack->bottom_card_ = copy_bottom->prev_;
-  move_stack->bottom_card_->next_ = NULL;
-  move_stack->top_card_ = src_stack->top_card_;
-
-  Card *copy_top = mallocCheck(sizeof(Card *));
-  copy_top = move_stack->top_card_;
-  while(copy_top->next_ != NULL)
-  {
-    if(copy_top->next_->value_ == value && copy_top->next_->color_ == color)
-    {
-      break;
-    }
-    copy_top = copy_top->next_;
-  }
-  if(copy_top->next_->next_ != NULL)
-  {
-    copy_top->next_->next_ = NULL;
-  }
-
-  copy_bottom->prev_ = NULL;
-  src_stack->top_card_ = copy_bottom;
-  freeStacks(&move_stack);
-  free(copy_bottom);
-  free(copy_top);*/
-//endregion
 
   return EVERYTHING_OK;
 }
@@ -576,22 +541,24 @@ ReturnValue move(CardStack **stacks, StackType dest_stack, char color, char *val
 /// @param stack stack to search in
 /// @param spec_card card to be searched
 ///
-/// @return searched card or null if not found
+/// @return searched card position or 0 if not found
 //
-Card *findCard(CardStack *stack, Card *spec_card)
+int findCard(CardStack *stack, Card *spec_card)
 {
+   int counter = 0;
    Card *old_top = stack->top_card_;
    while(old_top != NULL)
    {
-     if(old_top->color_ == spec_card->color_ && old_top->value_ == spec_card->value_ )
+     if(old_top->color_ == spec_card->color_ && *old_top->value_ == *spec_card->value_ )
      {
        copyCard(spec_card, old_top);
-       return spec_card;
+       return counter;
      }
      old_top = old_top->next_; //move one card down
+     counter++;
    }
 
-  return NULL;
+  return 0;
 }
 
 //------------------------------------------------------------------------------
@@ -752,7 +719,7 @@ ReturnValue addCardsToStacks(char **cards, CardStack **stacks)
   }
   for(int po_card = 0; po_card <= card; po_card++)
   {
-    addTop(stacks[PICK_OFF_STACK], cards[card][0], getCardValue(cards[card]));
+    addTop(stacks[PICK_OFF_STACK], cards[po_card][0], getCardValue(cards[po_card]));
   }
   return EVERYTHING_OK;
 }
