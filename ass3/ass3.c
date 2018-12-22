@@ -148,7 +148,7 @@ void playLoop(CardStack **stacks)
     }
     else if((move_command = checkForMoveCommand(input)) != NULL)
     {
-      if(atoi(move_command[2]) < 1 || move_command[2]) > 6)
+      if(atoi(move_command[2]) < 1 || move_command[2] > 6)
       {
         printf("[INFO] Invalid command!\n");
       }
