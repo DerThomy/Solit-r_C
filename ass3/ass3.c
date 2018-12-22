@@ -71,7 +71,7 @@ void copyCard(Card *dest, Card *src);
 void addTop(CardStack *stack, char color, char *value);
 Card delTop(CardStack *stack);
 int findCard(CardStack *stack, Card *spec_card);
-ReturnValue move(CardStack **stacks, StackType dest_stack, char color, char *value);
+ReturnValue move(CardStack **stacks, int dest_stack, char color, char *value);
 void printCard(Card *card);
 ReturnValue readCardsFromPath(char *path, CardStack **stacks);
 ReturnValue readCardsFromFile(FILE *file, CardStack **stacks);
@@ -496,7 +496,7 @@ Card delTop(CardStack *stack)
 ///
 /// @return a ReturnValue which shows if the move Command was valid
 //
-ReturnValue move(CardStack **stacks, StackType dest_stack, char color, char *value)
+ReturnValue move(CardStack **stacks, int dest_stack, char color, char *value)
 {
   //1. Find the stack which holds the card
   StackType src_stack = 0;
