@@ -537,18 +537,34 @@ ReturnValue move(CardStack **stacks, int dest_stack, char color, char *value)
     }
   }
 
-  if((dest_stack > 0 && dest_stack < 5) && ((stacks[dest_stack]->top_card_->color_ == color) || ((*stacks[dest_stack]->top_card_->value_)-1 == *value)))
+  if(stacks[dest_stack]->top_card_ != NULL)
+  {
+    if((dest_stack > 0 && dest_stack < 5) && ((stacks[dest_stack]->top_card_->color_ == color) || ((*stacks[dest_stack]->top_card_->value_)-1 != *value)))
+    {
+      return INVALID_MOVE;
+    }
+    else if((dest_stack == 5 || dest_stack == 6) && ((stacks[dest_stack]->top_card_->color_ != color)|| ((*stacks[dest_stack]->top_card_->value_)+1 != *value)))
+    {
+      return INVALID_MOVE;
+    }
+  }
+  else if(position == -1 || dest_stack == 0)
   {
     return INVALID_MOVE;
   }
-  else if((dest_stack == 5 || dest_stack == 6) && (stacks[dest_stack]->top_card_->color_ != color))
+  else
   {
-    return INVALID_MOVE;
+    if((dest_stack > 0 && dest_stack < 5) && (*value != *("K")))
+    {
+      return INVALID_MOVE;
+    }
+    else if((dest_stack == 5 || dest_stack == 6) && (*value != *("A")))
+    {
+      return INVALID_MOVE;
+    }
   }
-  else if(position == -1)
-  {
-    return INVALID_MOVE;
-  }
+
+
   //2. Copy the cards that will be moved
   //Find the position of the card in the specific stack
   Card *copy_top = mallocCheck(sizeof(Card *));
