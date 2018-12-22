@@ -101,14 +101,19 @@ int main(int argc, char **argv)
   initStacks(stacks);
 
   ReturnValue return_value = readCardsFromPath(argv[1], stacks);
+  renderStacks(stacks);
+  move(stacks,1,'R',"9");
+  renderStacks(stacks);
 
-  if(return_value == EVERYTHING_OK)
+  return 0;
+
+  /*if(return_value == EVERYTHING_OK)
   {
     playLoop(stacks);
   }
   freeStacks(stacks);
 
-  return printErrorMessage(return_value);
+  return printErrorMessage(return_value);*/
 }
 
 //------------------------------------------------------------------------------
@@ -138,13 +143,23 @@ void playLoop(CardStack **stacks)
       printf(" - exit\n");
     }
     else if(!strcmp(input, "exit\n"))
+    {
       running = 0;
+    }
     else if((move_command = checkForMoveCommand(input)) != NULL)
     {
+     if(move(stacks,atoi(move_command[2]),toupper(move_command[0][0]),move_command[1]) != EVERYTHING_OK)
+     {
+       printf("[INFO] Invalid move command!\n");
+     }
       free(move_command);
     }
     else
+    {
       printf("[INFO] Invalid command!\n");
+    }
+
+    renderStacks(stacks);
     free(input);
   } while(running);
 }
@@ -500,7 +515,6 @@ ReturnValue move(CardStack **stacks, int dest_stack, char color, char *value)
 {
   //1. Find the stack which holds the card
   StackType src_stack = 0;
-
   Card *move_card = mallocCheck(sizeof(Card *));
   move_card->color_ = color;
   move_card->value_ = value;
@@ -522,7 +536,16 @@ ReturnValue move(CardStack **stacks, int dest_stack, char color, char *value)
       }
     }
   }
-  if(position == -1)
+
+  if((dest_stack > 0 && dest_stack < 5) && ((stacks[dest_stack]->top_card_->color_ == color) || ((*stacks[dest_stack]->top_card_->value_)-1 == *value)))
+  {
+    return INVALID_MOVE;
+  }
+  else if((dest_stack == 5 || dest_stack == 6) && (stacks[dest_stack]->top_card_->color_ != color))
+  {
+    return INVALID_MOVE;
+  }
+  else if(position == -1)
   {
     return INVALID_MOVE;
   }
@@ -530,16 +553,18 @@ ReturnValue move(CardStack **stacks, int dest_stack, char color, char *value)
   //Find the position of the card in the specific stack
   Card *copy_top = mallocCheck(sizeof(Card *));
   copy_top = stacks[src_stack]->top_card_;
-  int counter = 0;
-  while(counter < position)
+  if(position != 0)
   {
-    copy_top = copy_top->next_;
-    counter++;
+    int counter = 0;
+    while(counter < position)
+    {
+      copy_top = copy_top->next_;
+      counter++;
+    }
+    move_card->prev_->next_ = move_card;
   }
   move_card->next_ = NULL;
   move_card->prev_ = copy_top->prev_;
-  move_card->prev_->next_ = move_card;
-
   //3. Delete the cards from src_stack from top_card and bottom_card
   if(position == 0)
   {
