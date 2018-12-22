@@ -103,18 +103,19 @@ int main(int argc, char **argv)
 
   ReturnValue return_value = readCardsFromPath(argv[1], stacks);
   renderStacks(stacks);
-  move(stacks,1,'R',"9");
+  //move(stacks,1,'R',"Q");
   renderStacks(stacks);
+  //freeStacks(stacks);
 
-  return 0;
+  //return 0;
 
-  /*if(return_value == EVERYTHING_OK)
+  if(return_value == EVERYTHING_OK)
   {
     playLoop(stacks);
   }
   freeStacks(stacks);
 
-  return printErrorMessage(return_value);*/
+  return printErrorMessage(return_value);
 }
 
 int areCardsSorted(Card *cards, int isGameStack)
@@ -183,23 +184,16 @@ void playLoop(CardStack **stacks)
     }
     else if((move_command = checkForMoveCommand(input)) != NULL)
     {
-      if(atoi(move_command[2]) < 1 || move_command[2] > 6)
-      {
-        printf("[INFO] Invalid command!\n");
-      }
-
-     if(move(stacks,atoi(move_command[2]),toupper(move_command[0][0]),move_command[1]) != EVERYTHING_OK)
-     {
+      if(move(stacks,atoi(move_command[2]),toupper(move_command[0][0]),move_command[1]) != EVERYTHING_OK)
        printf("[INFO] Invalid move command!\n");
-     }
+      else
+        renderStacks(stacks);
       free(move_command);
     }
     else
     {
       printf("[INFO] Invalid command!\n");
     }
-
-    renderStacks(stacks);
     free(input);
   } while(running);
 }
