@@ -485,7 +485,17 @@ Card delTop(CardStack *stack)
   free(old_top);              // now we can free the old card
   return copy_old_top;                // and return the card we remembered
 }
-
+//------------------------------------------------------------------------------
+///
+/// includes all the game logic of the move command, it moves cards between stacks if its not against game rules
+///
+/// @param stacks list of stacks
+/// @param dest_stack the stack that gets the cards
+/// @param color the color of the card that needs to be moved
+/// @param value the value of the card that needs to be moved
+///
+/// @return a ReturnValue which shows if the move Command was valid
+//
 ReturnValue move(CardStack **stacks, StackType dest_stack, char color, char *value)
 {
   //1. Find the stack which holds the card
