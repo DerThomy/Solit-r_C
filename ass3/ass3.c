@@ -178,7 +178,7 @@ char **checkForMoveCommand(char *input)
   if(move != NULL && !strcmp(move, "move"))
   {
     col = strtok(NULL, " ");
-    if(col != NULL && (!strcmp(col,"r") || !strcmp(col,"b")))
+    if(col != NULL && (!strcmp(col,"Red") || !strcmp(col,"Black")))
     {
       move_command[0] = col;
       val = strtok(NULL, " ");
