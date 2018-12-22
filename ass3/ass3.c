@@ -104,7 +104,7 @@ int main(int argc, char **argv)
   renderStacks(stacks);
   printf("\n");
 
-  move(stacks,4,'B', "9");
+  move(stacks,4,'B', "J");
 
   renderStacks(stacks);
   freeStacks(stacks);
@@ -527,17 +527,38 @@ ReturnValue move(CardStack **stacks, StackType dest_stack, char color, char *val
   }
   //2. Copy the cards that will be moved
   //Find the position of the card in the specific stack
+  Card *copy_top = mallocCheck(sizeof(Card *));
+  copy_top = stacks[src_stack]->top_card_;
+  int counter = 0;
+  while(counter < position)
+  {
+    copy_top = copy_top->next_;
+    counter++;
+  }
   move_card->next_ = NULL;
-  move_card->prev_ = stacks[src_stack]->top_card_[position].prev_;
+  move_card->prev_ = copy_top->prev_;
+  move_card->prev_->next_ = move_card;
+
   //3. Delete the cards from src_stack from top_card and bottom_card
   if(position == 0)
   {
     delTop(stacks[src_stack]);
   }
+  else if((stacks[src_stack]->bottom_card_->color_ == copy_top->color_) && (*stacks[src_stack]->bottom_card_->value_ == *copy_top->value_))
+  {
+    stacks[src_stack]->bottom_card_ = NULL;
+    stacks[src_stack]->top_card_ = NULL;
+  }
   else
   {
-
+    stacks[src_stack]->top_card_ = copy_top->next_;
+    stacks[src_stack]->top_card_->prev_ = NULL;
+    if(stacks[src_stack]->top_card_->next_ == NULL)
+    {
+      stacks[src_stack]->bottom_card_ = stacks[src_stack]->top_card_;
+    }
   }
+  free(copy_top);
   //4. Add the cards to dest_stack
   if(move_card->prev_ == NULL)
   {
@@ -545,11 +566,17 @@ ReturnValue move(CardStack **stacks, StackType dest_stack, char color, char *val
   }
   else
   {
-
+    Card* copy_move_card = mallocCheck(sizeof(Card *));
+    copy_move_card = move_card;
+    while(copy_move_card != NULL)
+    {
+      addTop(stacks[dest_stack],copy_move_card->color_, copy_move_card->value_);
+      copy_move_card = copy_move_card->prev_;
+    }
+    free(copy_move_card);
   }
 
   free(move_card);
-
   return EVERYTHING_OK;
 }
 
