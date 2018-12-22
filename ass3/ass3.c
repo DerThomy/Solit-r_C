@@ -103,7 +103,7 @@ int main(int argc, char **argv)
 
   ReturnValue return_value = readCardsFromPath(argv[1], stacks);
   renderStacks(stacks);
-  //move(stacks,1,'R',"Q");
+  move(stacks,1,'R',"Q");
   renderStacks(stacks);
   //freeStacks(stacks);
 
@@ -573,7 +573,7 @@ ReturnValue move(CardStack **stacks, int dest_stack, char color, char *value)
 
   if(stacks[dest_stack]->top_card_ != NULL)
   {
-    if((dest_stack > 0 && dest_stack < 5) && ((stacks[dest_stack]->top_card_->color_ == color) || ((*stacks[dest_stack]->top_card_->value_)-1 != *value)))
+    if((dest_stack > 0 && dest_stack < 5) && ((stacks[dest_stack]->top_card_->color_ == color) || ((*stacks[dest_stack]->top_card_->value_)-1 != *value))) //muss noch wirklich einen value niedriger gemacht werden
     {
       return INVALID_MOVE;
     }
