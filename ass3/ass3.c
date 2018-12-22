@@ -72,6 +72,7 @@ void addTop(CardStack *stack, char color, char *value);
 Card delTop(CardStack *stack);
 int findCard(CardStack *stack, Card *spec_card);
 ReturnValue move(CardStack **stacks, int dest_stack, char color, char *value);
+int areCardsSorted(Card *cards, int isGameStack);
 void printCard(Card *card);
 ReturnValue readCardsFromPath(char *path, CardStack **stacks);
 ReturnValue readCardsFromFile(FILE *file, CardStack **stacks);
@@ -116,6 +117,40 @@ int main(int argc, char **argv)
   return printErrorMessage(return_value);*/
 }
 
+int areCardsSorted(Card *cards, int isGameStack)
+{
+  if(isGameStack == 1)
+  {
+    Card *copy_card = mallocCheck(sizeof(Card *));
+    copy_card = cards;
+    while(copy_card->prev_ != NULL)
+    {
+      //(*stacks[dest_stack]->top_card_->value_)-1
+      if((*copy_card->value_)-1 != *copy_card->prev_->value_)
+      {
+        return 0;
+      }
+      copy_card = copy_card->prev_;
+    }
+    free(copy_card);
+  }
+  else
+  {
+    Card *copy_card = mallocCheck(sizeof(Card *));
+    copy_card = cards;
+    while(copy_card->prev_ != NULL)
+    {
+      //(*stacks[dest_stack]->top_card_->value_)-1
+      if((*copy_card->value_)+1 != *copy_card->prev_->value_)
+      {
+        return 0;
+      }
+      copy_card = copy_card->prev_;
+    }
+    free(copy_card);
+  }
+  return 1;
+}
 //------------------------------------------------------------------------------
 ///
 /// Main game loop. Gets user input and renders gameboard until exit
@@ -586,6 +621,15 @@ ReturnValue move(CardStack **stacks, int dest_stack, char color, char *value)
   }
   move_card->next_ = NULL;
   move_card->prev_ = copy_top->prev_;
+
+  if((src_stack > 0 && src_stack < 5) && (areCardsSorted(move_card,1) != 1))
+  {
+    return INVALID_MOVE;
+  }
+  else if((src_stack == 5 || src_stack == 6) && (areCardsSorted(move_card,0) != 1))
+  {
+    return INVALID_MOVE;
+  }
   //3. Delete the cards from src_stack from top_card and bottom_card
   if(position == 0)
   {
