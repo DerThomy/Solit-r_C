@@ -148,6 +148,11 @@ void playLoop(CardStack **stacks)
     }
     else if((move_command = checkForMoveCommand(input)) != NULL)
     {
+      if(atoi(move_command[2]) < 1 || move_command[2]) > 6)
+      {
+        printf("[INFO] Invalid command!\n");
+      }
+
      if(move(stacks,atoi(move_command[2]),toupper(move_command[0][0]),move_command[1]) != EVERYTHING_OK)
      {
        printf("[INFO] Invalid move command!\n");
@@ -548,7 +553,7 @@ ReturnValue move(CardStack **stacks, int dest_stack, char color, char *value)
       return INVALID_MOVE;
     }
   }
-  else if(position == -1 || dest_stack == 0)
+  else if(position == -1 || dest_stack == 0 || (src_stack == 5 || src_stack == 6))
   {
     return INVALID_MOVE;
   }
