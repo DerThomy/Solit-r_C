@@ -104,7 +104,7 @@ int main(int argc, char **argv)
   renderStacks(stacks);
   printf("\n");
 
-  move(stacks,4,'B', "3");
+  move(stacks,4,'B', "9");
 
   renderStacks(stacks);
   freeStacks(stacks);
@@ -513,21 +513,37 @@ ReturnValue move(CardStack **stacks, StackType dest_stack, char color, char *val
   {
     for(int a = 1; a < 7; a++)
     {
-      position = findCard(stacks[a],move_card);
-      if(position != 0)
+      position = findCard(stacks[a], move_card);
+      if(position != -1)
       {
         src_stack = a;
+        break;
       }
     }
   }
 
- // printf("%s\n", stacks[src_stack]->top_card_[1].next_->value_);
   //2. Copy the cards that will be moved
   //Find the position of the card in the specific stack
   move_card->next_ = NULL;
   move_card->prev_ = stacks[src_stack]->top_card_[position].prev_;
   //3. Delete the cards from src_stack from top_card and bottom_card
-  stacks[src_stack]->top_card_[position].prev_;
+  if(position == 0)
+  {
+    delTop(stacks[src_stack]);
+  }
+  else
+  {
+
+  }
+  //4. Add the cards to dest_stack
+  if(move_card->prev_ == NULL)
+  {
+    addTop(stacks[dest_stack],color,value);
+  }
+  else
+  {
+
+  }
 
   free(move_card);
 
@@ -558,7 +574,7 @@ int findCard(CardStack *stack, Card *spec_card)
      counter++;
    }
 
-  return 0;
+  return -1;
 }
 
 //------------------------------------------------------------------------------
