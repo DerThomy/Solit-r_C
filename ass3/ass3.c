@@ -23,7 +23,8 @@ typedef enum _ReturnValue_
   EVERYTHING_OK = 0,
   INVALID_ARGUMENTS = 1,
   OUT_OF_MEMORY = 2,
-  INVALID_FILE = 3
+  INVALID_FILE = 3,
+  NO_SUCH_CARD = 4
 } ReturnValue;
 
 //Array position of Stacks
@@ -35,8 +36,7 @@ typedef enum _StackType_
   GAME_STACK_3 = 3,
   GAME_STACK_4 = 4,
   DEPOSIT_STACK_1 = 5,
-  DEPOSIT_STACK_2 = 6,
-  MOVE_STACK = 7
+  DEPOSIT_STACK_2 = 6
 } StackType;
 
 //Stores Card
@@ -521,7 +521,10 @@ ReturnValue move(CardStack **stacks, StackType dest_stack, char color, char *val
       }
     }
   }
-
+  if(position == -1)
+  {
+    return NO_SUCH_CARD;
+  }
   //2. Copy the cards that will be moved
   //Find the position of the card in the specific stack
   move_card->next_ = NULL;
