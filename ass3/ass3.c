@@ -122,7 +122,7 @@ void playLoop(CardStack **stacks)
 {
   char *input = NULL;
   int running = 1;
-  char **move = NULL;
+  char **move_command = NULL;
   renderStacks(stacks);
   do
   {
@@ -139,10 +139,9 @@ void playLoop(CardStack **stacks)
     }
     else if(!strcmp(input, "exit\n"))
       running = 0;
-    else if((move = checkForMoveCommand(input)) != NULL)
+    else if((move_command = checkForMoveCommand(input)) != NULL)
     {
-
-      free(move);
+      free(move_command);
     }
     else
       printf("[INFO] Invalid command!\n");
@@ -170,7 +169,7 @@ char **checkForMoveCommand(char *input)
   if(move != NULL && !strcmp(move, "move"))
   {
     col = strtok(NULL, " ");
-    if(col != NULL && (!strcmp(col,"Red") || !strcmp(col,"Black")))
+    if(col != NULL && (!strcmp(col,"red") || !strcmp(col,"black")))
     {
       move_command[0] = col;
       val = strtok(NULL, " ");
