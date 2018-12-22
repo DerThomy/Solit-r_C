@@ -72,6 +72,7 @@ void addTop(CardStack *stack, char color, char *value);
 Card delTop(CardStack *stack);
 int findCard(CardStack *stack, Card *spec_card);
 ReturnValue move(CardStack **stacks, int dest_stack, char color, char *value);
+int getCardValueAsInt(char *value);
 int areCardsSorted(Card *cards, int isGameStack);
 void printCard(Card *card);
 ReturnValue readCardsFromPath(char *path, CardStack **stacks);
@@ -102,12 +103,6 @@ int main(int argc, char **argv)
   initStacks(stacks);
 
   ReturnValue return_value = readCardsFromPath(argv[1], stacks);
-  renderStacks(stacks);
-  move(stacks,1,'R',"Q");
-  renderStacks(stacks);
-  //freeStacks(stacks);
-
-  //return 0;
 
   if(return_value == EVERYTHING_OK)
   {
@@ -554,7 +549,7 @@ ReturnValue move(CardStack **stacks, int dest_stack, char color, char *value)
   move_card->value_ = value;
 
   int position = 0;
-  if((*stacks[PICK_OFF_STACK]->top_card_->value_ == *value) && (stacks[PICK_OFF_STACK]->top_card_->color_ == color))
+  if(!strcmp(stacks[PICK_OFF_STACK]->top_card_->value_, value) && (stacks[PICK_OFF_STACK]->top_card_->color_ == color))
   {
     src_stack = PICK_OFF_STACK;
   }
@@ -573,27 +568,32 @@ ReturnValue move(CardStack **stacks, int dest_stack, char color, char *value)
 
   if(stacks[dest_stack]->top_card_ != NULL)
   {
-    if((dest_stack > 0 && dest_stack < 5) && ((stacks[dest_stack]->top_card_->color_ == color) || ((*stacks[dest_stack]->top_card_->value_)-1 != *value))) //muss noch wirklich einen value niedriger gemacht werden
+    if((dest_stack > 0 && dest_stack < 5) && ((stacks[dest_stack]->top_card_->color_ == color) || (getCardValueAsInt(stacks[dest_stack]->top_card_->value_)-1 != getCardValueAsInt(value)))) //muss noch wirklich einen value niedriger gemacht werden
     {
+      printf("same color or wrong value: %c %d", color, getCardValueAsInt(value));
       return INVALID_MOVE;
     }
-    else if((dest_stack == 5 || dest_stack == 6) && ((stacks[dest_stack]->top_card_->color_ != color)|| ((*stacks[dest_stack]->top_card_->value_)+1 != *value)))
+    else if((dest_stack == 5 || dest_stack == 6) && ((stacks[dest_stack]->top_card_->color_ != color)|| (getCardValueAsInt(stacks[dest_stack]->top_card_->value_)+1 != getCardValueAsInt(value))))
     {
+      printf("not same color or wrong value: %c %d", color, getCardValueAsInt(value));
       return INVALID_MOVE;
     }
   }
   else if(position == -1 || dest_stack == 0 || (src_stack == 5 || src_stack == 6))
   {
+    printf("position = -1 or dest stack = 0 or srcstack = 5 srcstack = 6");
     return INVALID_MOVE;
   }
   else
   {
-    if((dest_stack > 0 && dest_stack < 5) && (*value != *("K")))
+    if((dest_stack > 0 && dest_stack < 5) && strcmp(value, "K"))
     {
+      printf("empty game stack but card is not K");
       return INVALID_MOVE;
     }
-    else if((dest_stack == 5 || dest_stack == 6) && (*value != *("A")))
+    else if((dest_stack == 5 || dest_stack == 6) && strcmp(value, "A"))
     {
+      printf("empty dep stack but card is not A");
       return INVALID_MOVE;
     }
   }
@@ -618,10 +618,12 @@ ReturnValue move(CardStack **stacks, int dest_stack, char color, char *value)
 
   if((src_stack > 0 && src_stack < 5) && (areCardsSorted(move_card,1) != 1))
   {
+    printf("game stack but not sorted");
     return INVALID_MOVE;
   }
   else if((src_stack == 5 || src_stack == 6) && (areCardsSorted(move_card,0) != 1))
   {
+    printf("dep stack but not sorted");
     return INVALID_MOVE;
   }
   //3. Delete the cards from src_stack from top_card and bottom_card
@@ -629,7 +631,7 @@ ReturnValue move(CardStack **stacks, int dest_stack, char color, char *value)
   {
     delTop(stacks[src_stack]);
   }
-  else if((stacks[src_stack]->bottom_card_->color_ == copy_top->color_) && (*stacks[src_stack]->bottom_card_->value_ == *copy_top->value_))
+  else if((stacks[src_stack]->bottom_card_->color_ == copy_top->color_) && !strcmp(stacks[src_stack]->bottom_card_->value_, copy_top->value_))
   {
     stacks[src_stack]->bottom_card_ = NULL;
     stacks[src_stack]->top_card_ = NULL;
@@ -663,6 +665,45 @@ ReturnValue move(CardStack **stacks, int dest_stack, char color, char *value)
 
   free(move_card);
   return EVERYTHING_OK;
+}
+
+//------------------------------------------------------------------------------
+///
+/// Takes card value and returns it as int indicating its value
+///
+/// @param value vlaue to be converted
+///
+/// @return value as integer
+//
+int getCardValueAsInt(char *value)
+{
+  if((strlen(value) == 1 && (*value > '2' && *value < '9')) || !strcmp(value, "10"))
+  {
+    return atoi(value);
+  }
+  else if(strlen(value) == 1)
+  {
+    printf("\n%c", toupper(*value));
+    switch(toupper(*value))
+    {
+      case 'A':
+        return 1;
+        break;
+      case 'J':
+        return 11;
+        break;
+      case 'Q':
+        return 12;
+        break;
+      case 'K':
+        return 13;
+        break;
+      default:
+        return 0;
+    }
+  }
+  printf("\n card value as int failed: %s", value);
+  return 0;
 }
 
 //------------------------------------------------------------------------------
