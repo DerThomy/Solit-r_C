@@ -101,22 +101,14 @@ int main(int argc, char **argv)
   initStacks(stacks);
 
   ReturnValue return_value = readCardsFromPath(argv[1], stacks);
-  renderStacks(stacks);
-  printf("\n");
 
-  move(stacks,4,'B', "J");
-
-  renderStacks(stacks);
-  freeStacks(stacks);
-  return 0;
-
-/*  if(return_value == EVERYTHING_OK)
+  if(return_value == EVERYTHING_OK)
   {
     playLoop(stacks);
   }
   freeStacks(stacks);
 
-  return printErrorMessage(return_value);*/
+  return printErrorMessage(return_value);
 }
 
 //------------------------------------------------------------------------------
