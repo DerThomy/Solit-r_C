@@ -24,7 +24,7 @@ typedef enum _ReturnValue_
   INVALID_ARGUMENTS = 1,
   OUT_OF_MEMORY = 2,
   INVALID_FILE = 3,
-  NO_SUCH_CARD = 4
+  INVALID_MOVE = 4
 } ReturnValue;
 
 //Array position of Stacks
@@ -523,7 +523,7 @@ ReturnValue move(CardStack **stacks, StackType dest_stack, char color, char *val
   }
   if(position == -1)
   {
-    return NO_SUCH_CARD;
+    return INVALID_MOVE;
   }
   //2. Copy the cards that will be moved
   //Find the position of the card in the specific stack
