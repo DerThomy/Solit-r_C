@@ -175,11 +175,11 @@ void playLoop(CardStack **stacks)
     {
       running = 0;
     }
-    else if((move_command = checkForMoveCommand(input)))
+    else if((move_command = checkForMoveCommand(input)) != NULL)
     {
       if(move_command[1][0] < '1' || move_command[1][0] > '9')
         move_command[1][0] = toupper(move_command[1][0]);
-      if(move(stacks,atoi(move_command[2]),toupper(move_command[0][0]),copyString(move_command[1])) != EVERYTHING_OK)
+      if(!move(stacks,atoi(move_command[2]),toupper(move_command[0][0]),copyString(move_command[1])))
        printf("[INFO] Invalid move command!\n");
       else
       {
@@ -592,14 +592,14 @@ int move(CardStack **stacks, int dest_stack, char color, char *value)
   {
     if((dest_stack > 0 && dest_stack < 5) && ((stacks[dest_stack]->top_card_->color_ == color) || (getCardValueAsInt(stacks[dest_stack]->top_card_->value_)-1 != getCardValueAsInt(value)))) //muss noch wirklich einen value niedriger gemacht werden
     {
-      printf("same color or wrong value: %c %d", color, getCardValueAsInt(value));
+      //printf("same color or wrong value: %c %d", color, getCardValueAsInt(value));
       free(move_card->value_);
       free(move_card);
       return 0;
     }
     else if((dest_stack == 5 || dest_stack == 6) && ((stacks[dest_stack]->top_card_->color_ != color)|| (getCardValueAsInt(stacks[dest_stack]->top_card_->value_)+1 != getCardValueAsInt(value))))
     {
-      printf("not same color or wrong value: %c %d", color, getCardValueAsInt(value));
+      //printf("not same color or wrong value: %c %d", color, getCardValueAsInt(value));
       free(move_card->value_);
       free(move_card);
       return 0;
@@ -607,7 +607,7 @@ int move(CardStack **stacks, int dest_stack, char color, char *value)
   }
   else if(position == -1 || dest_stack == 0 || (src_stack == 5 || src_stack == 6))
   {
-    printf("position = -1 or dest stack = 0 or srcstack = 5 srcstack = 6");
+    //printf("position = -1 or dest stack = 0 or srcstack = 5 srcstack = 6");
     free(move_card->value_);
     free(move_card);
     return 0;
@@ -616,14 +616,14 @@ int move(CardStack **stacks, int dest_stack, char color, char *value)
   {
     if((dest_stack > 0 && dest_stack < 5) && strcmp(value, "K"))
     {
-      printf("empty game stack but card is not K");
+      //printf("empty game stack but card is not K");
       free(move_card->value_);
       free(move_card);
       return 0;
     }
     else if((dest_stack == 5 || dest_stack == 6) && strcmp(value, "A"))
     {
-      printf("empty dep stack but card is not A");
+      //printf("empty dep stack but card is not A");
       free(move_card->value_);
       free(move_card);
       return 0;
@@ -649,14 +649,14 @@ int move(CardStack **stacks, int dest_stack, char color, char *value)
 
   if((src_stack > 0 && src_stack < 5) && (areCardsSorted(move_card,1) != 1))
   {
-    printf("game stack but not sorted");
+    //printf("game stack but not sorted");
     free(move_card->value_);
     free(move_card);
     return 0;
   }
   else if((src_stack == 5 || src_stack == 6) && (areCardsSorted(move_card,0) != 1))
   {
-    printf("dep stack but not sorted");
+    //printf("dep stack but not sorted");
     free(move_card->value_);
     free(move_card);
     return 0;
@@ -668,7 +668,7 @@ int move(CardStack **stacks, int dest_stack, char color, char *value)
   }
   else if(compareCards(stacks[src_stack]->bottom_card_, copy_top))
   {
-    printf("bottom \n%d\n", position);
+    //printf("bottom \n%d\n", position);
     stacks[src_stack]->bottom_card_ = NULL;
     stacks[src_stack]->top_card_ = NULL;
   }
@@ -841,7 +841,6 @@ ReturnValue readCardsFromFile(FILE *file, CardStack **stacks)
     {
       if(len > 7)
       {
-        printf("too long");
         return_value = INVALID_FILE;
         free(line);
         break;
@@ -853,7 +852,6 @@ ReturnValue readCardsFromFile(FILE *file, CardStack **stacks)
     if(strlen(line) != 0)
     {
       line[len] = '\0';
-      //printf("%s %d\n", line, (unsigned int)strlen(line));
       cards[line_counter++] = line;
     }
     else
@@ -882,7 +880,6 @@ ReturnValue checkCards(char **input, int lines)
 {
   if(lines < 26 || lines > 26)
   {
-    printf("too short or big");
     return INVALID_FILE;
   }
     
@@ -905,7 +902,6 @@ ReturnValue checkCards(char **input, int lines)
         {
           if(!strcmp(input[line], included_cards[included]))
           {
-            printf("not unique %s\n", input[line]);
             free(included_cards);
             return INVALID_FILE;
           }
