@@ -400,6 +400,7 @@ void printRows(CardStack **stacks)
         other_stacks_cards[stack] = other_stacks_cards[stack] == NULL ? NULL : other_stacks_cards[stack]->prev_;
       printOtherStacks(other_stacks_cards[stack], stack);
     }
+    printf("\n");
     pick_off_card = pick_off_card == NULL ? NULL : pick_off_card->prev_;
   }
   free(other_stacks_cards);
