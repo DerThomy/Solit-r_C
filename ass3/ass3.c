@@ -373,8 +373,8 @@ void freeStacks(CardStack **stacks)
     printf("%d: ", stack);
     for(Card *card = stacks[stack]->top_card_; card != NULL; card = next)
     {
-      printf("%c%s;", card->color_, card->value_);
       next = card->next_;
+      printf("%c%s;", card->color_, card->value_);
       free(card->value_);
       free(card);
     }
@@ -660,18 +660,17 @@ int move(CardStack **stacks, int dest_stack, char color, char *value)
   //3. Add the cards to dest_stack
   if(move_card->prev_ == NULL)
   {
-    addTop(stacks[dest_stack],color,value);
+    addTop(stacks[dest_stack],color,copyString(value));
   }
   else
   {
     Card* copy_move_card = move_card;
     while(copy_move_card != NULL)
     {
-      addTop(stacks[dest_stack],copy_move_card->color_, copy_move_card->value_);
+      addTop(stacks[dest_stack],copy_move_card->color_, copyString(copy_move_card->value_));
       copy_move_card = copy_move_card->prev_;
     }
   }
-  //free(move_card->value_);
 
   //4. Delete the cards from src_stack from top_card and bottom_card
   if(position == 0)
@@ -687,15 +686,14 @@ int move(CardStack **stacks, int dest_stack, char color, char *value)
   else
   {
     int counter = 0;
-    copy_top = stacks[src_stack]->top_card_;
     while(counter < position)
     {
-      copy_top = copy_top->next_;
       delTop(stacks[src_stack]);
       counter++;
     }
   }
   free(move_card);
+  free(value);
   return 1;
 }
 
