@@ -23,8 +23,7 @@ typedef enum _ReturnValue_
   EVERYTHING_OK = 0,
   INVALID_ARGUMENTS = 1,
   OUT_OF_MEMORY = 2,
-  INVALID_FILE = 3,
-  INVALID_MOVE = 4
+  INVALID_FILE = 3
 } ReturnValue;
 
 //Array position of Stacks
@@ -70,9 +69,9 @@ void printOtherStacks(Card *card, int stack);
 void *mallocCheck(size_t size);
 void copyCard(Card *dest, Card *src);
 void addTop(CardStack *stack, char color, char *value);
-Card delTop(CardStack *stack);
+void delTop(CardStack *stack);
 int findCard(CardStack *stack, Card *spec_card);
-ReturnValue move(CardStack **stacks, int dest_stack, char color, char *value);
+int move(CardStack **stacks, int dest_stack, char color, char *value);
 int compareCards(Card *card1, Card *card2);
 int getCardValueAsInt(char *value);
 int areCardsSorted(Card *cards, int isGameStack);
@@ -176,7 +175,7 @@ void playLoop(CardStack **stacks)
     {
       running = 0;
     }
-    else if((move_command = checkForMoveCommand(input)) != NULL)
+    else if((move_command = checkForMoveCommand(input)))
     {
       if(move_command[1][0] < '1' || move_command[1][0] > '9')
         move_command[1][0] = toupper(move_command[1][0]);
@@ -536,7 +535,7 @@ void addTop(CardStack *stack, char color, char *value)
 ///
 /// @return card that was deleted
 //
-Card delTop(CardStack *stack)
+void delTop(CardStack *stack)
 {
   Card *old_top = stack->top_card_;  // remember the old top card
 
@@ -551,7 +550,6 @@ Card delTop(CardStack *stack)
   }
   free(old_top->value_);
   free(old_top);            // now we can free the old card
-  return copy_old_top;                // and return the card we remembered
 }
 //------------------------------------------------------------------------------
 ///
@@ -564,7 +562,7 @@ Card delTop(CardStack *stack)
 ///
 /// @return a ReturnValue which shows if the move Command was valid
 //
-ReturnValue move(CardStack **stacks, int dest_stack, char color, char *value)
+int move(CardStack **stacks, int dest_stack, char color, char *value)
 {
   //1. Find the stack which holds the card
   StackType src_stack = 0;
@@ -597,14 +595,14 @@ ReturnValue move(CardStack **stacks, int dest_stack, char color, char *value)
       printf("same color or wrong value: %c %d", color, getCardValueAsInt(value));
       free(move_card->value_);
       free(move_card);
-      return INVALID_MOVE;
+      return 0;
     }
     else if((dest_stack == 5 || dest_stack == 6) && ((stacks[dest_stack]->top_card_->color_ != color)|| (getCardValueAsInt(stacks[dest_stack]->top_card_->value_)+1 != getCardValueAsInt(value))))
     {
       printf("not same color or wrong value: %c %d", color, getCardValueAsInt(value));
       free(move_card->value_);
       free(move_card);
-      return INVALID_MOVE;
+      return 0;
     }
   }
   else if(position == -1 || dest_stack == 0 || (src_stack == 5 || src_stack == 6))
@@ -612,7 +610,7 @@ ReturnValue move(CardStack **stacks, int dest_stack, char color, char *value)
     printf("position = -1 or dest stack = 0 or srcstack = 5 srcstack = 6");
     free(move_card->value_);
     free(move_card);
-    return INVALID_MOVE;
+    return 0;
   }
   else
   {
@@ -621,14 +619,14 @@ ReturnValue move(CardStack **stacks, int dest_stack, char color, char *value)
       printf("empty game stack but card is not K");
       free(move_card->value_);
       free(move_card);
-      return INVALID_MOVE;
+      return 0;
     }
     else if((dest_stack == 5 || dest_stack == 6) && strcmp(value, "A"))
     {
       printf("empty dep stack but card is not A");
       free(move_card->value_);
       free(move_card);
-      return INVALID_MOVE;
+      return 0;
     }
   }
 
@@ -654,14 +652,14 @@ ReturnValue move(CardStack **stacks, int dest_stack, char color, char *value)
     printf("game stack but not sorted");
     free(move_card->value_);
     free(move_card);
-    return INVALID_MOVE;
+    return 0;
   }
   else if((src_stack == 5 || src_stack == 6) && (areCardsSorted(move_card,0) != 1))
   {
     printf("dep stack but not sorted");
     free(move_card->value_);
     free(move_card);
-    return INVALID_MOVE;
+    return 0;
   }
   //3. Delete the cards from src_stack from top_card and bottom_card
   if(position == 0)
@@ -699,7 +697,7 @@ ReturnValue move(CardStack **stacks, int dest_stack, char color, char *value)
   }
   
   free(move_card);
-  return EVERYTHING_OK;
+  return 1;
 }
 
 //------------------------------------------------------------------------------
