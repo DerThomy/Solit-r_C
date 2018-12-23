@@ -651,7 +651,6 @@ ReturnValue move(CardStack **stacks, int dest_stack, char color, char *value)
   }
   else
   {
-    printf("\n%d\n", position);
     stacks[src_stack]->top_card_ = copy_top->next_;
     stacks[src_stack]->top_card_->prev_ = NULL;
     if(stacks[src_stack]->top_card_->next_ == NULL) // Überflüssig, da bottom_card automatisch gleich top card ist.. ändert sich ja nicht
@@ -740,7 +739,6 @@ int getCardValueAsInt(char *value)
         return 0;
     }
   }
-  printf("\n card value as int failed: %s", value);
   return 0;
 }
 
@@ -757,7 +755,6 @@ int findCard(CardStack *stack, Card *spec_card)
 {
     int counter = 0;
     Card *old_top = stack->top_card_;
-    printf("\n");
     while(old_top != NULL)
     {
       if(compareCards(old_top, spec_card))
@@ -768,7 +765,6 @@ int findCard(CardStack *stack, Card *spec_card)
       old_top = old_top->next_; //move one card down
       counter++;
     }
-    printf("\n");
   return -1;
 }
 
