@@ -72,7 +72,7 @@ void addTop(CardStack *stack, char color, char *value);
 void delTop(CardStack *stack);
 int findCard(CardStack *stack, Card *spec_card);
 int move(CardStack **stacks, int dest_stack, char color, char *value);
-int checkGameRules(CardStack **stacks, int position, int dest_stack, int src_stack, char color, char *value);
+int checkGameRules(CardStack **stacks, Card *move_card, int position, int dest_stack, int src_stack, char color, char *value);
 int compareCards(Card *card1, Card *card2);
 int getCardValueAsInt(char *value);
 int areCardsSorted(Card *cards, int isGameStack);
@@ -621,13 +621,6 @@ int move(CardStack **stacks, int dest_stack, char color, char *value)
     }
   }
 
-  if(!checkGameRules(stacks, position, dest_stack, src_stack, color, value))
-  {
-    free(move_card->value_);
-    free(move_card);
-    return 0;
-  }
-
   //2. Copy the cards that will be moved
   //Find the position of the card in the specific stack
   Card *copy_top = stacks[src_stack]->top_card_;
@@ -644,14 +637,15 @@ int move(CardStack **stacks, int dest_stack, char color, char *value)
   move_card->next_ = NULL;
   move_card->prev_ = copy_top->prev_;
 
-  if((src_stack > 0 && src_stack < 5) && (areCardsSorted(move_card,1) != 1))
+  //3. Game logik
+  if(!checkGameRules(stacks, move_card, position, dest_stack, src_stack, color, value))
   {
     free(move_card->value_);
     free(move_card);
     return 0;
   }
 
-  //3. Add the cards to dest_stack
+  //4. Add the cards to dest_stack
   if(move_card->prev_ == NULL)
   {
     addTop(stacks[dest_stack],color,copyString(value));
@@ -666,7 +660,7 @@ int move(CardStack **stacks, int dest_stack, char color, char *value)
     }
   }
 
-  //4. Delete the cards from src_stack from top_card and bottom_card
+  //5. Delete the cards from src_stack from top_card and bottom_card
   if(position == 0)
   {
     delTop(stacks[src_stack]);
@@ -696,7 +690,7 @@ int move(CardStack **stacks, int dest_stack, char color, char *value)
   return 1;
 }
 
-int checkGameRules(CardStack **stacks, int position, int dest_stack, int src_stack, char color, char *value)
+int checkGameRules(CardStack **stacks, Card *move_card, int position, int dest_stack, int src_stack, char color, char *value)
 {
     if(position == -1 || dest_stack == 0 || (src_stack == 5 || src_stack == 6))
   {
@@ -723,6 +717,10 @@ int checkGameRules(CardStack **stacks, int position, int dest_stack, int src_sta
     {
       return 0;
     }
+  }
+  if((src_stack > 0 && src_stack < 5) && (areCardsSorted(move_card,1) != 1))
+  {
+    return 0;
   }
   return 1;
 }
