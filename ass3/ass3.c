@@ -661,35 +661,33 @@ int move(CardStack **stacks, int dest_stack, char color, char *value)
   }
 
   //5. Delete the cards from src_stack from top_card and bottom_card
-  if(position == 0)
+  int counter = 0;
+  while(counter <= position)
   {
     delTop(stacks[src_stack]);
+    counter++;
   }
-  else if(compareCards(stacks[src_stack]->bottom_card_, copy_top))
-  {
-    int counter = 0;
-    while(counter < position + 1)
-    {
-      delTop(stacks[src_stack]);
-      counter++;
-    }
-    stacks[src_stack]->bottom_card_ = NULL;
-    stacks[src_stack]->top_card_ = NULL;
-  }
-  else
-  {
-    int counter = 0;
-    while(counter < position + 1)
-    {
-      delTop(stacks[src_stack]);
-      counter++;
-    }
-  }
+
   free(move_card);
   free(value);
   return 1;
 }
 
+
+//------------------------------------------------------------------------------
+///
+/// Checks the game rules when card is moved
+///
+/// @param stacks all seven game stacks
+/// @param move_card cards to be moved
+/// @param position postion of cards to be moved in stack
+/// @param dest_stack destination stack for moved cards
+/// @param src_stack source stack of cards to be moved
+/// @param color color of first card from cards to be moved
+/// @param value of first card form cards to be moved
+///
+/// @return 1 if valid 0 if not
+//
 int checkGameRules(CardStack **stacks, Card *move_card, int position, int dest_stack, int src_stack, char color, char *value)
 {
     if(position == -1 || dest_stack == 0 || (src_stack == 5 || src_stack == 6))
