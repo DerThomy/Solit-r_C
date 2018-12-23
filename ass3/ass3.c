@@ -8,7 +8,7 @@
 // Authors: Simon Joham 11814175
 // Thomas Köhler 11827322
 //
-// Latest Changes: 13.12.2018 (by Simon Joham)
+// Latest Changes: 23.12.2018 (by Simon Joham)
 //-----------------------------------------------------------------------------
 //
 
@@ -669,11 +669,13 @@ int move(CardStack **stacks, int dest_stack, char color, char *value)
   }
   else
   {
-    stacks[src_stack]->top_card_ = copy_top->next_;
-    stacks[src_stack]->top_card_->prev_ = NULL;
-    if(stacks[src_stack]->top_card_->next_ == NULL) // Überflüssig, da bottom_card automatisch gleich top card ist.. ändert sich ja nicht
+    int counter = 0;
+    copy_top = stacks[src_stack]->top_card_;
+    while(position < counter)
     {
-      stacks[src_stack]->bottom_card_ = stacks[src_stack]->top_card_;
+      copy_top = copy_top->next_;
+      delTop(stacks[src_stack]);
+      counter++;
     }
   }
   //4. Add the cards to dest_stack
