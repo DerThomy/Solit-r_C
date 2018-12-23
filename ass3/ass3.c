@@ -118,8 +118,7 @@ int areCardsSorted(Card *cards, int isGameStack)
 {
   if(isGameStack == 1)
   {
-    Card *copy_card = mallocCheck(sizeof(Card *));
-    copy_card = cards;
+    Card *copy_card = cards;
     while(copy_card->prev_ != NULL)
     {
       //(*stacks[dest_stack]->top_card_->value_)-1
@@ -608,8 +607,7 @@ ReturnValue move(CardStack **stacks, int dest_stack, char color, char *value)
 
   //2. Copy the cards that will be moved
   //Find the position of the card in the specific stack
-  Card *copy_top = mallocCheck(sizeof(Card *));
-  copy_top = stacks[src_stack]->top_card_;
+  Card *copy_top = stacks[src_stack]->top_card_;
   if(position != 0)
   {
     int counter = 0;
@@ -627,14 +625,12 @@ ReturnValue move(CardStack **stacks, int dest_stack, char color, char *value)
   {
     printf("game stack but not sorted");
     free(move_card);
-    free(copy_top);
     return INVALID_MOVE;
   }
   else if((src_stack == 5 || src_stack == 6) && (areCardsSorted(move_card,0) != 1))
   {
     printf("dep stack but not sorted");
     free(move_card);
-    free(copy_top);
     return INVALID_MOVE;
   }
   //3. Delete the cards from src_stack from top_card and bottom_card
@@ -657,7 +653,6 @@ ReturnValue move(CardStack **stacks, int dest_stack, char color, char *value)
       stacks[src_stack]->bottom_card_ = stacks[src_stack]->top_card_;
     }
   }
-  //free(copy_top);
   //4. Add the cards to dest_stack
   if(move_card->prev_ == NULL)
   {
@@ -665,14 +660,12 @@ ReturnValue move(CardStack **stacks, int dest_stack, char color, char *value)
   }
   else
   {
-    Card* copy_move_card = mallocCheck(sizeof(Card *));
-    copy_move_card = move_card;
+    Card* copy_move_card = move_card;
     while(copy_move_card != NULL)
     {
       addTop(stacks[dest_stack],copy_move_card->color_, copy_move_card->value_);
       copy_move_card = copy_move_card->prev_;
     }
-    free(copy_move_card);
   }
 
   free(move_card);
