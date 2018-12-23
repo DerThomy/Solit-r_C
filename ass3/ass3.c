@@ -57,6 +57,8 @@ typedef struct CardStack_
 }CardStack;
 
 void playLoop(CardStack **stacks);
+int testForWin(CardStack **stacks);
+int countCardStack(CardStack *stack);
 char **checkForMoveCommand(char *input);
 int checkForCardValue(char *input);
 char *getInput();
@@ -182,7 +184,11 @@ void playLoop(CardStack **stacks)
       if(move(stacks,atoi(move_command[2]),toupper(move_command[0][0]),copyString(move_command[1])) != EVERYTHING_OK)
        printf("[INFO] Invalid move command!\n");
       else
+      {
         renderStacks(stacks);
+        if(testForWin(stacks))
+          break;
+      }
       free(move_command);
     }
     else
@@ -191,6 +197,25 @@ void playLoop(CardStack **stacks)
     }
     free(input);
   } while(running);
+}
+
+int testForWin(CardStack **stacks)
+{
+  if(countCardStack(stacks[DEPOSIT_STACK_1]) == 13 && countCardStack(stacks[DEPOSIT_STACK_2]) == 13)
+    return 1;
+  return 0;
+}
+
+int countCardStack(CardStack *stack)
+{
+  Card *old_card = stack->top_card_;
+  int count = 0;
+  for(; old_card != NULL;)
+  {
+    count++;
+    old_card = old_card->next_;
+  }
+  return count;
 }
 
 //------------------------------------------------------------------------------
