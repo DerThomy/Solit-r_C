@@ -72,6 +72,7 @@ void addTop(CardStack *stack, char color, char *value);
 void delTop(CardStack *stack);
 int findCard(CardStack *stack, Card *spec_card);
 int move(CardStack **stacks, int dest_stack, char color, char *value);
+int checkGameRules(CardStack **stacks, int position, int dest_stack, int src_stack, char color, char *value);
 int compareCards(Card *card1, Card *card2);
 int getCardValueAsInt(char *value);
 int areCardsSorted(Card *cards, int isGameStack);
@@ -620,43 +621,12 @@ int move(CardStack **stacks, int dest_stack, char color, char *value)
     }
   }
 
-  if(position == -1 || dest_stack == 0 || (src_stack == 5 || src_stack == 6))
+  if(!checkGameRules(stacks, position, dest_stack, src_stack, color, value))
   {
     free(move_card->value_);
     free(move_card);
     return 0;
   }
-  if(stacks[dest_stack]->top_card_ != NULL)
-  {
-    if((dest_stack > 0 && dest_stack < 5) && ((stacks[dest_stack]->top_card_->color_ == color) || (getCardValueAsInt(stacks[dest_stack]->top_card_->value_)-1 != getCardValueAsInt(value)))) //muss noch wirklich einen value niedriger gemacht werden
-    {
-      free(move_card->value_);
-      free(move_card);
-      return 0;
-    }
-    else if((dest_stack == 5 || dest_stack == 6) && ((stacks[dest_stack]->top_card_->color_ != color)|| (getCardValueAsInt(stacks[dest_stack]->top_card_->value_)+1 != getCardValueAsInt(value))))
-    {
-      free(move_card->value_);
-      free(move_card);
-      return 0;
-    }
-  }
-  else
-  {
-    if((dest_stack > 0 && dest_stack < 5) && strcmp(value, "K"))
-    {
-      free(move_card->value_);
-      free(move_card);
-      return 0;
-    }
-    else if((dest_stack == 5 || dest_stack == 6) && strcmp(value, "A"))
-    {
-      free(move_card->value_);
-      free(move_card);
-      return 0;
-    }
-  }
-
 
   //2. Copy the cards that will be moved
   //Find the position of the card in the specific stack
@@ -723,6 +693,37 @@ int move(CardStack **stacks, int dest_stack, char color, char *value)
   }
   free(move_card);
   free(value);
+  return 1;
+}
+
+int checkGameRules(CardStack **stacks, int position, int dest_stack, int src_stack, char color, char *value)
+{
+    if(position == -1 || dest_stack == 0 || (src_stack == 5 || src_stack == 6))
+  {
+    return 0;
+  }
+  if(stacks[dest_stack]->top_card_ != NULL)
+  {
+    if((dest_stack > 0 && dest_stack < 5) && ((stacks[dest_stack]->top_card_->color_ == color) || (getCardValueAsInt(stacks[dest_stack]->top_card_->value_)-1 != getCardValueAsInt(value)))) //muss noch wirklich einen value niedriger gemacht werden
+    {
+      return 0;
+    }
+    else if((dest_stack == 5 || dest_stack == 6) && ((stacks[dest_stack]->top_card_->color_ != color)|| (getCardValueAsInt(stacks[dest_stack]->top_card_->value_)+1 != getCardValueAsInt(value))))
+    {
+      return 0;
+    }
+  }
+  else
+  {
+    if((dest_stack > 0 && dest_stack < 5) && strcmp(value, "K"))
+    {
+      return 0;
+    }
+    else if((dest_stack == 5 || dest_stack == 6) && strcmp(value, "A"))
+    {
+      return 0;
+    }
+  }
   return 1;
 }
 
