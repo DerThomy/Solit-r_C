@@ -53,7 +53,6 @@ typedef struct CardStack_
 {
   struct _Card_ *top_card_;
   struct _Card_ *bottom_card_;
-  int stack_type_;
 }CardStack;
 
 void playLoop(CardStack **stacks);
@@ -749,16 +748,12 @@ int getCardValueAsInt(char *value)
     {
       case 'A':
         return 1;
-        break;
       case 'J':
         return 11;
-        break;
       case 'Q':
         return 12;
-        break;
       case 'K':
         return 13;
-        break;
       default:
         return 0;
     }
@@ -968,10 +963,8 @@ char *getCardValue(char *card)
   {
     case 'R':
       return copyString(&card[3]);
-      break;
     case 'B':
       return copyString(&card[5]);
-      break;
     default:
       return NULL;
   }
