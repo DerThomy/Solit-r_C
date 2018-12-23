@@ -656,7 +656,24 @@ int move(CardStack **stacks, int dest_stack, char color, char *value)
     free(move_card);
     return 0;
   }
-  //3. Delete the cards from src_stack from top_card and bottom_card
+
+  //3. Add the cards to dest_stack
+  if(move_card->prev_ == NULL)
+  {
+    addTop(stacks[dest_stack],color,value);
+  }
+  else
+  {
+    Card* copy_move_card = move_card;
+    while(copy_move_card != NULL)
+    {
+      addTop(stacks[dest_stack],copy_move_card->color_, copy_move_card->value_);
+      copy_move_card = copy_move_card->prev_;
+    }
+  }
+  //free(move_card->value_);
+
+  //4. Delete the cards from src_stack from top_card and bottom_card
   if(position == 0)
   {
     delTop(stacks[src_stack]);
@@ -678,21 +695,6 @@ int move(CardStack **stacks, int dest_stack, char color, char *value)
       counter++;
     }
   }
-  //4. Add the cards to dest_stack
-  if(move_card->prev_ == NULL)
-  {
-    addTop(stacks[dest_stack],color,value);
-  }
-  else
-  {
-    Card* copy_move_card = move_card;
-    while(copy_move_card != NULL)
-    {
-      addTop(stacks[dest_stack],copy_move_card->color_, copy_move_card->value_);
-      copy_move_card = copy_move_card->prev_;
-    }
-  }
-  //free(move_card->value_);
   free(move_card);
   return 1;
 }
