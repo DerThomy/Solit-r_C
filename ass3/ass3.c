@@ -605,9 +605,9 @@ int move(CardStack **stacks, int dest_stack, char color, char *value)
       return 0;
     }
   }
-  else if(position == -1 || dest_stack == 0 || (src_stack == 5 || src_stack == 6))
+  if(position == -1 || dest_stack == 0 || (src_stack == 5 || src_stack == 6))
   {
-    //printf("position = -1 or dest stack = 0 or srcstack = 5 srcstack = 6");
+    printf("position = -1 or dest stack = 0 or srcstack = 5 srcstack = 6");
     free(move_card->value_);
     free(move_card);
     return 0;
