@@ -663,6 +663,7 @@ int move(CardStack **stacks, int dest_stack, char color, char *value)
   }
   else if(compareCards(stacks[src_stack]->bottom_card_, copy_top))
   {
+    delTop(stacks[src_stack]);
     stacks[src_stack]->bottom_card_ = NULL;
     stacks[src_stack]->top_card_ = NULL;
   }
