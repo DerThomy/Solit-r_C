@@ -374,9 +374,9 @@ void freeStacks(CardStack **stacks)
     for(Card *card = stacks[stack]->top_card_; card != NULL; card = next)
     {
       printf("%c%s;", card->color_, card->value_);
+      next = card->next_;
       free(card->value_);
       free(card);
-      next = card->next_;
     }
     printf("\n");
     free(stacks[stack]);
