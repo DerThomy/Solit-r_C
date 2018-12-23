@@ -115,6 +115,16 @@ int main(int argc, char **argv)
   return printErrorMessage(return_value);
 }
 
+//------------------------------------------------------------------------------
+///
+/// Checks if card array is sorted depending wether they are from a game stack
+/// or a deposit deck (descending / ascending)
+///
+/// @param cards pointer array to be sorted
+/// @param isGameStack indicates if cards are from gameStack
+///
+/// @return 1 if sorted 0 if not
+//
 int areCardsSorted(Card *cards, int isGameStack)
 {
   if(isGameStack == 1)
@@ -143,6 +153,7 @@ int areCardsSorted(Card *cards, int isGameStack)
   }
   return 1;
 }
+
 //------------------------------------------------------------------------------
 ///
 /// Main game loop. Gets user input and renders gameboard until exit
@@ -187,7 +198,7 @@ void playLoop(CardStack **stacks)
       }
       free(move_command);
     }
-    else
+    else if(!strcmp(input, "value"))
     {
       printf("[INFO] Invalid command!\n");
     }
@@ -195,6 +206,14 @@ void playLoop(CardStack **stacks)
   } while(running);
 }
 
+//------------------------------------------------------------------------------
+///
+/// Tests if game is won
+///
+/// @param stacks all the seven game stacks
+///
+/// @return 1 if won 0 if not
+//
 int testForWin(CardStack **stacks)
 {
   if(countCardStack(stacks[DEPOSIT_STACK_1]) == 13 && countCardStack(stacks[DEPOSIT_STACK_2]) == 13)
@@ -202,6 +221,14 @@ int testForWin(CardStack **stacks)
   return 0;
 }
 
+//------------------------------------------------------------------------------
+///
+/// Counts all Cards in a Stack
+///
+/// @param stack stack to be counted
+///
+/// @return number of cards in a stack
+//
 int countCardStack(CardStack *stack)
 {
   Card *old_card = stack->top_card_;
@@ -370,15 +397,12 @@ void freeStacks(CardStack **stacks)
   for(int stack = 0; stack < 7; stack++)
   {
     Card *next = NULL;
-    printf("%d: ", stack);
     for(Card *card = stacks[stack]->top_card_; card != NULL; card = next)
     {
       next = card->next_;
-      printf("%c%s;", card->color_, card->value_);
       free(card->value_);
       free(card);
     }
-    printf("\n");
     free(stacks[stack]);
   }
   free(stacks);
@@ -686,7 +710,7 @@ int move(CardStack **stacks, int dest_stack, char color, char *value)
   else
   {
     int counter = 0;
-    while(counter < position)
+    while(counter < position + 1)
     {
       delTop(stacks[src_stack]);
       counter++;
