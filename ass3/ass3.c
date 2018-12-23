@@ -671,7 +671,7 @@ int move(CardStack **stacks, int dest_stack, char color, char *value)
   {
     int counter = 0;
     copy_top = stacks[src_stack]->top_card_;
-    while(position < counter)
+    while(counter < position)
     {
       copy_top = copy_top->next_;
       delTop(stacks[src_stack]);
