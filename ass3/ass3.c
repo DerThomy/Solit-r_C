@@ -370,12 +370,15 @@ void freeStacks(CardStack **stacks)
   for(int stack = 0; stack < 7; stack++)
   {
     Card *next = NULL;
+    printf("%d: ", stack);
     for(Card *card = stacks[stack]->top_card_; card != NULL; card = next)
     {
-      next = card->next_;
+      printf("%c%s;", card->color_, card->value_);
       free(card->value_);
       free(card);
+      next = card->next_;
     }
+    printf("\n");
     free(stacks[stack]);
   }
   free(stacks);
@@ -535,21 +538,26 @@ void addTop(CardStack *stack, char color, char *value)
 //
 void delTop(CardStack *stack)
 {
-  if(stack->top_card_->next_ == NULL)
+  Card *old_top = stack->top_card_;
+  if(stack->top_card_ != NULL)
   {
-    stack->top_card_ = NULL;
-    stack->bottom_card_ = NULL;
-  }
-  else
-  {
-    stack->top_card_ = stack->top_card_->next_;
-    stack->top_card_->prev_ = NULL;
     if(stack->top_card_->next_ == NULL)
     {
-      stack->bottom_card_ = stack->top_card_;
+      stack->top_card_ = NULL;
+      stack->bottom_card_ = NULL;
     }
+    else
+    {
+      stack->top_card_ = stack->top_card_->next_;
+      stack->top_card_->prev_ = NULL;
+      if(stack->top_card_->next_ == NULL)
+      {
+        stack->bottom_card_ = stack->top_card_;
+      }
+    }
+    free(old_top->value_);
+    free(old_top);
   }
-
 }
 //------------------------------------------------------------------------------
 ///
@@ -571,7 +579,7 @@ int move(CardStack **stacks, int dest_stack, char color, char *value)
   move_card->value_ = value;
 
   int position = 0;
-  if(stacks[PICK_OFF_STACK]->top_card_!= NULL && !strcmp(stacks[PICK_OFF_STACK]->top_card_->value_, value) && (stacks[PICK_OFF_STACK]->top_card_->color_ == color))
+  if(stacks[PICK_OFF_STACK]->top_card_!= NULL && compareCards(stacks[PICK_OFF_STACK]->top_card_, move_card))
   {
     src_stack = PICK_OFF_STACK;
   }
@@ -681,7 +689,7 @@ int move(CardStack **stacks, int dest_stack, char color, char *value)
       copy_move_card = copy_move_card->prev_;
     }
   }
-  
+  //free(move_card->value_);
   free(move_card);
   return 1;
 }
