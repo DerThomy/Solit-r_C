@@ -358,7 +358,6 @@ void initStacks(CardStack **stacks)
     stacks[stack] = mallocCheck(sizeof(CardStack));
     stacks[stack]->top_card_ = NULL;
     stacks[stack]->bottom_card_ = NULL;
-    stacks[stack]->stack_type_ = stack;
   }
 }
 
