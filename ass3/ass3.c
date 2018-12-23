@@ -72,6 +72,7 @@ void addTop(CardStack *stack, char color, char *value);
 Card delTop(CardStack *stack);
 int findCard(CardStack *stack, Card *spec_card);
 ReturnValue move(CardStack **stacks, int dest_stack, char color, char *value);
+int compareCards(Card *card1, Card *card2);
 int getCardValueAsInt(char *value);
 int areCardsSorted(Card *cards, int isGameStack);
 void printCard(Card *card);
@@ -179,6 +180,8 @@ void playLoop(CardStack **stacks)
     }
     else if((move_command = checkForMoveCommand(input)) != NULL)
     {
+      if(move_command[1][0] < '1' || move_command[1][0] > '9')
+        move_command[1][0] = toupper(move_command[1][0]);
       if(move(stacks,atoi(move_command[2]),toupper(move_command[0][0]),move_command[1]) != EVERYTHING_OK)
        printf("[INFO] Invalid move command!\n");
       else
@@ -476,7 +479,7 @@ void *mallocCheck(size_t size)
 void copyCard(Card *dest, Card *src)
 {
   dest->color_ = src->color_;
-  dest->value_ = copyString(src->value_);
+  dest->value_ = src->value_;
 }
 
 //------------------------------------------------------------------------------
@@ -544,7 +547,7 @@ ReturnValue move(CardStack **stacks, int dest_stack, char color, char *value)
 {
   //1. Find the stack which holds the card
   StackType src_stack = 0;
-  Card *move_card = mallocCheck(sizeof(Card *));
+  Card *move_card = mallocCheck(sizeof(Card));
   move_card->color_ = color;
   move_card->value_ = value;
 
@@ -571,17 +574,20 @@ ReturnValue move(CardStack **stacks, int dest_stack, char color, char *value)
     if((dest_stack > 0 && dest_stack < 5) && ((stacks[dest_stack]->top_card_->color_ == color) || (getCardValueAsInt(stacks[dest_stack]->top_card_->value_)-1 != getCardValueAsInt(value)))) //muss noch wirklich einen value niedriger gemacht werden
     {
       printf("same color or wrong value: %c %d", color, getCardValueAsInt(value));
+      free(move_card);
       return INVALID_MOVE;
     }
     else if((dest_stack == 5 || dest_stack == 6) && ((stacks[dest_stack]->top_card_->color_ != color)|| (getCardValueAsInt(stacks[dest_stack]->top_card_->value_)+1 != getCardValueAsInt(value))))
     {
       printf("not same color or wrong value: %c %d", color, getCardValueAsInt(value));
+      free(move_card);
       return INVALID_MOVE;
     }
   }
   else if(position == -1 || dest_stack == 0 || (src_stack == 5 || src_stack == 6))
   {
     printf("position = -1 or dest stack = 0 or srcstack = 5 srcstack = 6");
+    free(move_card);
     return INVALID_MOVE;
   }
   else
@@ -589,11 +595,13 @@ ReturnValue move(CardStack **stacks, int dest_stack, char color, char *value)
     if((dest_stack > 0 && dest_stack < 5) && strcmp(value, "K"))
     {
       printf("empty game stack but card is not K");
+      free(move_card);
       return INVALID_MOVE;
     }
     else if((dest_stack == 5 || dest_stack == 6) && strcmp(value, "A"))
     {
       printf("empty dep stack but card is not A");
+      free(move_card);
       return INVALID_MOVE;
     }
   }
@@ -611,7 +619,7 @@ ReturnValue move(CardStack **stacks, int dest_stack, char color, char *value)
       copy_top = copy_top->next_;
       counter++;
     }
-    move_card->prev_->next_ = move_card;
+    //move_card->prev_->next_ = move_card;
   }
   move_card->next_ = NULL;
   move_card->prev_ = copy_top->prev_;
@@ -619,11 +627,15 @@ ReturnValue move(CardStack **stacks, int dest_stack, char color, char *value)
   if((src_stack > 0 && src_stack < 5) && (areCardsSorted(move_card,1) != 1))
   {
     printf("game stack but not sorted");
+    free(move_card);
+    free(copy_top);
     return INVALID_MOVE;
   }
   else if((src_stack == 5 || src_stack == 6) && (areCardsSorted(move_card,0) != 1))
   {
     printf("dep stack but not sorted");
+    free(move_card);
+    free(copy_top);
     return INVALID_MOVE;
   }
   //3. Delete the cards from src_stack from top_card and bottom_card
@@ -631,16 +643,18 @@ ReturnValue move(CardStack **stacks, int dest_stack, char color, char *value)
   {
     delTop(stacks[src_stack]);
   }
-  else if((stacks[src_stack]->bottom_card_->color_ == copy_top->color_) && !strcmp(stacks[src_stack]->bottom_card_->value_, copy_top->value_))
+  else if(compareCards(stacks[src_stack]->bottom_card_, copy_top))
   {
+    printf("bottom \n%d\n", position);
     stacks[src_stack]->bottom_card_ = NULL;
     stacks[src_stack]->top_card_ = NULL;
   }
   else
   {
+    printf("\n%d\n", position);
     stacks[src_stack]->top_card_ = copy_top->next_;
     stacks[src_stack]->top_card_->prev_ = NULL;
-    if(stacks[src_stack]->top_card_->next_ == NULL)
+    if(stacks[src_stack]->top_card_->next_ == NULL) // Überflüssig, da bottom_card automatisch gleich top card ist.. ändert sich ja nicht
     {
       stacks[src_stack]->bottom_card_ = stacks[src_stack]->top_card_;
     }
@@ -669,6 +683,31 @@ ReturnValue move(CardStack **stacks, int dest_stack, char color, char *value)
 
 //------------------------------------------------------------------------------
 ///
+/// Compares two cards
+///
+/// @param card1 first card
+/// @param card2 secound card
+///
+/// @return 0 if not same 1 if same
+//
+int compareCards(Card *card1, Card *card2)
+{
+  if(card1 == NULL && card2 == NULL)
+    return 1;
+  if(card1 == NULL || card2 == NULL)
+    return 0;
+  if(toupper(card1->color_) == toupper(card2->color_))
+  {
+    if(card1->value_[0] > '0' && card1->value_[0] < '0')
+      return card1->value_[0] == card2->value_[0] ? 1 : 0;
+    else
+      return toupper(card1->value_[0]) == toupper(card2->value_[0]) ? 1 : 0;
+  }
+  return 0;
+}
+
+//------------------------------------------------------------------------------
+///
 /// Takes card value and returns it as int indicating its value
 ///
 /// @param value vlaue to be converted
@@ -683,7 +722,6 @@ int getCardValueAsInt(char *value)
   }
   else if(strlen(value) == 1)
   {
-    printf("\n%c", toupper(*value));
     switch(toupper(*value))
     {
       case 'A':
@@ -713,23 +751,24 @@ int getCardValueAsInt(char *value)
 /// @param stack stack to search in
 /// @param spec_card card to be searched
 ///
-/// @return searched card position or 0 if not found
+/// @return searched card position or -1 if not found
 //
 int findCard(CardStack *stack, Card *spec_card)
 {
-   int counter = 0;
-   Card *old_top = stack->top_card_;
-   while(old_top != NULL)
-   {
-     if(old_top->color_ == spec_card->color_ && *old_top->value_ == *spec_card->value_ )
-     {
-       copyCard(spec_card, old_top);
-       return counter;
-     }
-     old_top = old_top->next_; //move one card down
-     counter++;
-   }
-
+    int counter = 0;
+    Card *old_top = stack->top_card_;
+    printf("\n");
+    while(old_top != NULL)
+    {
+      if(compareCards(old_top, spec_card))
+      {
+        copyCard(spec_card, old_top);
+        return counter;
+      }
+      old_top = old_top->next_; //move one card down
+      counter++;
+    }
+    printf("\n");
   return -1;
 }
 
