@@ -194,11 +194,11 @@ void playLoop(CardStack **stacks)
       {
         renderStacks(stacks);
         if(testForWin(stacks))
-          break;
+          running = 0;
       }
       free(move_command);
     }
-    else if(!strcmp(input, "value"))
+    else if(strcmp(input, "\n"))
     {
       printf("[INFO] Invalid command!\n");
     }
@@ -703,7 +703,12 @@ int move(CardStack **stacks, int dest_stack, char color, char *value)
   }
   else if(compareCards(stacks[src_stack]->bottom_card_, copy_top))
   {
-    delTop(stacks[src_stack]);
+    int counter = 0;
+    while(counter < position + 1)
+    {
+      delTop(stacks[src_stack]);
+      counter++;
+    }
     stacks[src_stack]->bottom_card_ = NULL;
     stacks[src_stack]->top_card_ = NULL;
   }
