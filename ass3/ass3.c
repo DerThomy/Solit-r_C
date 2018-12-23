@@ -129,7 +129,6 @@ int areCardsSorted(Card *cards, int isGameStack)
       }
       copy_card = copy_card->prev_;
     }
-    free(copy_card);
   }
   else
   {
@@ -144,7 +143,6 @@ int areCardsSorted(Card *cards, int isGameStack)
       }
       copy_card = copy_card->prev_;
     }
-    free(copy_card);
   }
   return 1;
 }
@@ -529,7 +527,8 @@ Card delTop(CardStack *stack)
   {
     stack->bottom_card_ = stack->top_card_;
   }
-  free(old_top);              // now we can free the old card
+  free(old_top->value_);
+  free(old_top);            // now we can free the old card
   return copy_old_top;                // and return the card we remembered
 }
 //------------------------------------------------------------------------------
@@ -658,7 +657,7 @@ ReturnValue move(CardStack **stacks, int dest_stack, char color, char *value)
       stacks[src_stack]->bottom_card_ = stacks[src_stack]->top_card_;
     }
   }
-  free(copy_top);
+  //free(copy_top);
   //4. Add the cards to dest_stack
   if(move_card->prev_ == NULL)
   {
@@ -697,7 +696,7 @@ int compareCards(Card *card1, Card *card2)
     return 0;
   if(toupper(card1->color_) == toupper(card2->color_))
   {
-    if(card1->value_[0] > '0' && card1->value_[0] < '0')
+    if(card1->value_[0] > '0' && card1->value_[0] < '9')
       return card1->value_[0] == card2->value_[0] ? 1 : 0;
     else
       return toupper(card1->value_[0]) == toupper(card2->value_[0]) ? 1 : 0;
