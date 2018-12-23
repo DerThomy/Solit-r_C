@@ -179,7 +179,7 @@ void playLoop(CardStack **stacks)
     {
       if(move_command[1][0] < '1' || move_command[1][0] > '9')
         move_command[1][0] = toupper(move_command[1][0]);
-      if(move(stacks,atoi(move_command[2]),toupper(move_command[0][0]),move_command[1]) != EVERYTHING_OK)
+      if(move(stacks,atoi(move_command[2]),toupper(move_command[0][0]),copyString(move_command[1])) != EVERYTHING_OK)
        printf("[INFO] Invalid move command!\n");
       else
         renderStacks(stacks);
@@ -572,12 +572,14 @@ ReturnValue move(CardStack **stacks, int dest_stack, char color, char *value)
     if((dest_stack > 0 && dest_stack < 5) && ((stacks[dest_stack]->top_card_->color_ == color) || (getCardValueAsInt(stacks[dest_stack]->top_card_->value_)-1 != getCardValueAsInt(value)))) //muss noch wirklich einen value niedriger gemacht werden
     {
       printf("same color or wrong value: %c %d", color, getCardValueAsInt(value));
+      free(move_card->value_);
       free(move_card);
       return INVALID_MOVE;
     }
     else if((dest_stack == 5 || dest_stack == 6) && ((stacks[dest_stack]->top_card_->color_ != color)|| (getCardValueAsInt(stacks[dest_stack]->top_card_->value_)+1 != getCardValueAsInt(value))))
     {
       printf("not same color or wrong value: %c %d", color, getCardValueAsInt(value));
+      free(move_card->value_);
       free(move_card);
       return INVALID_MOVE;
     }
@@ -585,6 +587,7 @@ ReturnValue move(CardStack **stacks, int dest_stack, char color, char *value)
   else if(position == -1 || dest_stack == 0 || (src_stack == 5 || src_stack == 6))
   {
     printf("position = -1 or dest stack = 0 or srcstack = 5 srcstack = 6");
+    free(move_card->value_);
     free(move_card);
     return INVALID_MOVE;
   }
@@ -593,12 +596,14 @@ ReturnValue move(CardStack **stacks, int dest_stack, char color, char *value)
     if((dest_stack > 0 && dest_stack < 5) && strcmp(value, "K"))
     {
       printf("empty game stack but card is not K");
+      free(move_card->value_);
       free(move_card);
       return INVALID_MOVE;
     }
     else if((dest_stack == 5 || dest_stack == 6) && strcmp(value, "A"))
     {
       printf("empty dep stack but card is not A");
+      free(move_card->value_);
       free(move_card);
       return INVALID_MOVE;
     }
@@ -624,12 +629,14 @@ ReturnValue move(CardStack **stacks, int dest_stack, char color, char *value)
   if((src_stack > 0 && src_stack < 5) && (areCardsSorted(move_card,1) != 1))
   {
     printf("game stack but not sorted");
+    free(move_card->value_);
     free(move_card);
     return INVALID_MOVE;
   }
   else if((src_stack == 5 || src_stack == 6) && (areCardsSorted(move_card,0) != 1))
   {
     printf("dep stack but not sorted");
+    free(move_card->value_);
     free(move_card);
     return INVALID_MOVE;
   }
@@ -667,7 +674,7 @@ ReturnValue move(CardStack **stacks, int dest_stack, char color, char *value)
       copy_move_card = copy_move_card->prev_;
     }
   }
-
+  
   free(move_card);
   return EVERYTHING_OK;
 }
@@ -751,7 +758,6 @@ int findCard(CardStack *stack, Card *spec_card)
     {
       if(compareCards(old_top, spec_card))
       {
-        copyCard(spec_card, old_top);
         return counter;
       }
       old_top = old_top->next_; //move one card down
