@@ -67,12 +67,12 @@ void printRows(CardStack **stacks);
 void printPickOffStack(Card *card);
 void printOtherStacks(Card *card, int stack);
 void *mallocCheck(size_t size);
-void copyCard(Card *dest, Card *src);
 void addTop(CardStack *stack, char color, char *value);
 void delTop(CardStack *stack);
 int findCard(CardStack *stack, Card *spec_card);
 int move(CardStack **stacks, int dest_stack, char color, char *value);
-int checkGameRules(CardStack **stacks, Card *move_card, int position, int dest_stack, int src_stack, char color, char *value);
+int checkGameRules(CardStack **stacks, Card *move_card, int position,
+  int dest_stack, int src_stack, char color, char *value);
 int compareCards(Card *card1, Card *card2);
 int getCardValueAsInt(char *value);
 int areCardsSorted(Card *cards, int isGameStack);
@@ -515,20 +515,6 @@ void *mallocCheck(size_t size)
 
 //------------------------------------------------------------------------------
 ///
-/// copies the values of one card to another
-///
-/// @param dest destination card
-/// @param src source card
-///
-//
-void copyCard(Card *dest, Card *src)
-{
-  dest->color_ = src->color_;
-  dest->value_ = src->value_;
-}
-
-//------------------------------------------------------------------------------
-///
 /// add card to the beginning of a card stack
 ///
 /// @param stack stack to be added to
@@ -584,6 +570,7 @@ void delTop(CardStack *stack)
     free(old_top);
   }
 }
+
 //------------------------------------------------------------------------------
 ///
 /// includes all the game logic of the move command, it moves cards between stacks if its not against game rules
@@ -605,9 +592,7 @@ int move(CardStack **stacks, int dest_stack, char color, char *value)
 
   int position = 0;
   if(stacks[PICK_OFF_STACK]->top_card_!= NULL && compareCards(stacks[PICK_OFF_STACK]->top_card_, move_card))
-  {
     src_stack = PICK_OFF_STACK;
-  }
   else
   {
     for(int a = 1; a < 7; a++)
@@ -632,7 +617,6 @@ int move(CardStack **stacks, int dest_stack, char color, char *value)
       copy_top = copy_top->next_;
       counter++;
     }
-    //move_card->prev_->next_ = move_card;
   }
   move_card->next_ = NULL;
   move_card->prev_ = copy_top->prev_;
@@ -647,9 +631,7 @@ int move(CardStack **stacks, int dest_stack, char color, char *value)
 
   //4. Add the cards to dest_stack
   if(move_card->prev_ == NULL)
-  {
     addTop(stacks[dest_stack],color,copyString(value));
-  }
   else
   {
     Card* copy_move_card = move_card;
@@ -673,7 +655,6 @@ int move(CardStack **stacks, int dest_stack, char color, char *value)
   return 1;
 }
 
-
 //------------------------------------------------------------------------------
 ///
 /// Checks the game rules when card is moved
@@ -688,7 +669,8 @@ int move(CardStack **stacks, int dest_stack, char color, char *value)
 ///
 /// @return 1 if valid 0 if not
 //
-int checkGameRules(CardStack **stacks, Card *move_card, int position, int dest_stack, int src_stack, char color, char *value)
+int checkGameRules(CardStack **stacks, Card *move_card, int position, 
+  int dest_stack, int src_stack, char color, char *value)
 {
     if(position == -1 || dest_stack == 0 || (src_stack == 5 || src_stack == 6))
   {
@@ -696,11 +678,13 @@ int checkGameRules(CardStack **stacks, Card *move_card, int position, int dest_s
   }
   if(stacks[dest_stack]->top_card_ != NULL)
   {
-    if((dest_stack > 0 && dest_stack < 5) && ((stacks[dest_stack]->top_card_->color_ == color) || (getCardValueAsInt(stacks[dest_stack]->top_card_->value_)-1 != getCardValueAsInt(value)))) //muss noch wirklich einen value niedriger gemacht werden
+    if((dest_stack > 0 && dest_stack < 5) && ((stacks[dest_stack]->top_card_->color_ == color) || 
+      (getCardValueAsInt(stacks[dest_stack]->top_card_->value_)-1 != getCardValueAsInt(value))))
     {
       return 0;
     }
-    else if((dest_stack == 5 || dest_stack == 6) && ((stacks[dest_stack]->top_card_->color_ != color)|| (getCardValueAsInt(stacks[dest_stack]->top_card_->value_)+1 != getCardValueAsInt(value))))
+    else if((dest_stack == 5 || dest_stack == 6) && ((stacks[dest_stack]->top_card_->color_ != color) ||
+      (getCardValueAsInt(stacks[dest_stack]->top_card_->value_)+1 != getCardValueAsInt(value))))
     {
       return 0;
     }
