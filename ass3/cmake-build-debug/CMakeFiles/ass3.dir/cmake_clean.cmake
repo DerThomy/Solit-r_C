@@ -3,7 +3,7 @@ file(REMOVE_RECURSE
   "ass3.pdb"
   "ass3.exe"
   "ass3.exe.manifest"
-  "ass3.lib"
+  "libass3.dll.a"
 )
 
 # Per-language clean rules from dependency scanning.

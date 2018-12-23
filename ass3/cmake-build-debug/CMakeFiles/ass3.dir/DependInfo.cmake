@@ -6,7 +6,7 @@ set(CMAKE_DEPENDS_LANGUAGES
 set(CMAKE_DEPENDS_CHECK_C
   "C:/Users/Schule/CLionProjects/Solitaer_C/ass3/ass3.c" "C:/Users/Schule/CLionProjects/Solitaer_C/ass3/cmake-build-debug/CMakeFiles/ass3.dir/ass3.c.obj"
   )
-set(CMAKE_C_COMPILER_ID "MSVC")
+set(CMAKE_C_COMPILER_ID "GNU")
 
 # The include file search paths:
 set(CMAKE_C_TARGET_INCLUDE_PATH

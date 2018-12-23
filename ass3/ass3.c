@@ -95,7 +95,7 @@ ReturnValue printErrorMessage(ReturnValue return_value);
 //
 int main(int argc, char **argv)
 {
-/*  if(argc != 2)
+  if(argc != 2)
   {
     return printErrorMessage(INVALID_ARGUMENTS);
   }
@@ -111,49 +111,7 @@ int main(int argc, char **argv)
   }
   freeStacks(stacks);
 
-  return printErrorMessage(return_value);*/
-
-  CardStack *stack5 = mallocCheck(sizeof(CardStack) * 13);
-  addTop(stack5,'R',"A");
-  addTop(stack5,'R',"2");
-  addTop(stack5,'R',"3");
-  addTop(stack5,'R',"4");
-  addTop(stack5,'R',"5");
-  addTop(stack5,'R',"6");
-  addTop(stack5,'R',"7");
-  addTop(stack5,'R',"8");
-  addTop(stack5,'R',"9");
-  addTop(stack5,'R',"10");
-  addTop(stack5,'R',"J");
-  addTop(stack5,'R',"Q");
-  addTop(stack5,'R',"K");
-
-  CardStack *stack6 = mallocCheck(sizeof(CardStack) * 13);
-  addTop(stack6,'B',"A");
-  addTop(stack6,'B',"2");
-  addTop(stack6,'B',"3");
-  addTop(stack6,'B',"4");
-  addTop(stack6,'B',"5");
-  addTop(stack6,'B',"6");
-  addTop(stack6,'B',"7");
-  addTop(stack6,'B',"8");
-  addTop(stack6,'B',"9");
-  addTop(stack6,'B',"10");
-  addTop(stack6,'B',"J");
-  addTop(stack6,'B',"Q");
-  addTop(stack6,'B',"K");
-
-/*  CardStack **stacks = mallocCheck(sizeof(CardStack) * 2);
-  stacks[0] = stack5;
-  stacks[1] = stack6;
-
-  printf("%d\n",testForWin(stacks));
-
-  free(stack5);
-  free(stack6);
-  free(stacks);*/
-  return 0;
-
+  return printErrorMessage(return_value);
 }
 
 int areCardsSorted(Card *cards, int isGameStack)
@@ -241,7 +199,7 @@ void playLoop(CardStack **stacks)
 
 int testForWin(CardStack **stacks)
 {
-  if(countCardStack(stacks[0]) == 13 && countCardStack(stacks[1]) == 13)
+  if(countCardStack(stacks[DEPOSIT_STACK_1]) == 13 && countCardStack(stacks[DEPOSIT_STACK_2]) == 13)
     return 1;
   return 0;
 }
