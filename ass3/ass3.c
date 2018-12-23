@@ -906,6 +906,7 @@ ReturnValue checkCards(char **input, int lines)
             return INVALID_FILE;
           }
         }
+        char *car = cards[card];
         included_cards[included_counter++] = input[line];
         continue;
       }
